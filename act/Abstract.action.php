@@ -18,17 +18,7 @@ abstract class Action_Abstract
      */
     public function __construct()
     {
-        $this->Response = HTTP_Response::getInstance();
-    }
-
-    /**
-     * __call
-     *
-     * @return void
-     */
-    public function __call($methodName, $args)
-    {
-        
+        $this->Response = Ah_Response::getInstance();
     }
 
     /**

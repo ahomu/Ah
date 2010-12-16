@@ -1,15 +1,14 @@
 <?php
 
 /**
- * HTTP_Response provides managing http response detail.
+ * Ah_Response provides managing http response detail.
  *
- * @package     HTTP
+ * @package     Ah
  * @copyright   2010 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
- * @version     Release: 0.1
  */
-class HTTP_Response
+class Ah_Response
 {
     private
         $_version   = '1.1',
@@ -37,7 +36,7 @@ class HTTP_Response
      */
     public function setStatusCode($code)
     {
-        $this->_status  = $code.' '.HTTP_Response::$statusCode[$code];
+        $this->_status  = $code.' '.Ah_Response::$statusCode[$code];
     }
 
     /**

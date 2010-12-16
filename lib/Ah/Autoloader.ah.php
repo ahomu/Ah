@@ -36,18 +36,18 @@ class Ah_Autoloader
         if ( in_array($prefix, array('Model', 'View', 'Ah')) )
         {
             $pathStack  = array(DIR_LIB);
-            $compType   = strtolower($prefix);
+            $compType   = '.'.strtolower($prefix); // .model | .view | .ah
         }
         elseif ( $prefix === 'Action' )
         {
             $pathStack  = array(DIR_ACT);
-            $compType   = 'action';
+            $compType   = '.action';
             $className  = substr($className, strlen('Action_'));
         }
         else
         {
             $pathStack  = array(DIR_LIB.'/Class');
-            $compType   = 'class';
+            $compType   = '';
         }
 
         $chunks     = explode('_', $className);
@@ -55,7 +55,7 @@ class Ah_Autoloader
             $pathStack[] = $chunk;
         }
 
-        $classPath  = implode('/', $pathStack).".$compType.php";
+        $classPath  = implode('/', $pathStack)."$compType.php";
         if ( is_readable($classPath) ) {
             include($classPath);
         } else {
