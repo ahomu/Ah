@@ -122,7 +122,9 @@ class Ah_Response
      */
     public function send($body = null)
     {
-        if ( $body !== null ) $this->_body = $body;
+        if ( $body !== null ) {
+            $this->_body = $body;
+        }
 
         header("HTTP/{$this->_version} {$this->_status}");
         header("Content-Type: {$this->_mimetype}; charset={$this->_charset}");

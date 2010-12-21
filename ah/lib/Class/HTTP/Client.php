@@ -343,7 +343,7 @@ class HTTP_Client
     public function parseResponse()
     {
         $eol    = array("\r", "\n", '\r\n');
-        $regex  = '/^\s?HTTP\/([0-9].[0-9x])\s+([0-9]{3})\s+([0-9a-zA-z\s]*)$/';
+        $regex  = '/^\s?HTTP\/([0-9].[0-9x])\s+([0-9]{3})\s+([0-9a-zA-Z\s-]*)$/';
 
         while ( '' !== ($line = str_replace($eol, '', fgets($this->_connection))) ) {
             if ( strpos($line, ':') === false && preg_match($regex, $line, $match) )
@@ -368,6 +368,7 @@ class HTTP_Client
         // digest
         if ( 1
             and $code == 401
+            and isset($this->header['WWW-Authenticate'])
             and strpos($this->header['WWW-Authenticate'], 'Digest ') == 0
             and $this->_auth == 'Digest'
             and !empty($this->user)

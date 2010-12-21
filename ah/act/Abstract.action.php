@@ -3,7 +3,6 @@
 abstract class Action_Abstract
 {
     protected
-        $View,
         $Params,
         $Response;
 
@@ -62,7 +61,7 @@ abstract class Action_Abstract
      */
     public function output()
     {
-        if ( $this->View !== null ) {
+        if ( is_object($this->View) && method_exists($this->View, 'render') ) {
             $this->Response->send($this->View->render());
         } else {
             $this->Response->send();

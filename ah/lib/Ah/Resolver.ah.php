@@ -44,7 +44,7 @@ class Ah_Resolver
             $path = (ENABLE_SSL ? 'https://' : 'http://').REQUEST_HOST.$path;
         }
 
-        $Res = HTTP_Response::getInstance();
+        $Res = Ah_Response::getInstance();
         $Res->setStatusCode(303);
         $Res->setLocation($path);
         $Res->setBody(null);
@@ -61,11 +61,11 @@ class Ah_Resolver
         }
         catch ( Ah_Exception_MethodNotAllowed $e )
         {
-            header('HTTP/1.1 405 Method Not Allowed');
-            header('Content-type: text/html; charset=iso-8859-1');
+            $Res = Ah_Response::getInstance();
+            $Res->setStatusCode(405);
             header('Allow: '.$e->getMessage());
-            die(''
-                .'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
+            $Res->setBody(
+                 '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
                 .'<html><head>'
                 .'<title>405 Method Not Allowed</title>'
                 .'</head><body>'
@@ -74,13 +74,14 @@ class Ah_Resolver
                 .'<p>( note : Allowed methods are "'.$e->getMessage().'". )</p>'
                 .'</body></html>'
             );
+            $Res->send();
         }
         catch ( Ah_Exception_NotFound $e )
         {
-            header('HTTP/1.1 404 Not Found');
-            header('Content-type: text/html; charset=iso-8859-1');
-            die(''
-                .'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
+            $Res = Ah_Response::getInstance();
+            $Res->setStatusCode(404);
+            $Res->setBody(
+                 '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
                 .'<html><head>'
                 .'<title>404 Not Found</title>'
                 .'</head><body>'
@@ -89,6 +90,7 @@ class Ah_Resolver
                 .'<p>( note : "'.$e->getMessage().'" class file is missing. )</p>'
                 .'</body></html>'
             );
+            $Res->send();
         }
     }
 

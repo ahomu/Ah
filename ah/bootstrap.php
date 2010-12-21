@@ -73,7 +73,7 @@ abstract class Ah_Application
         define('IP_SERVER', $_SERVER['SERVER_ADDR']);
         define('IP_CLIENT', $_SERVER['REMOTE_ADDR']);
 
-        define('ENABLE_GZIP', !!(strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false));
+        define('ENABLE_GZIP', !!( isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false));
         define('ENABLE_SSL',  !!( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'));
 
         define('DIR_ACT',  DIR_ROOT.'/act');
