@@ -19,8 +19,8 @@
 define('DIR_ROOT', dirname(__FILE__));
 
 //require_once(DIR_ROOT.'/lib/Class/Twig/Autoloader.php');
-require_once(DIR_ROOT.'/lib/Ah/Autoloader.ah.php');
-require_once(DIR_ROOT.'/lib/Function.php');
+require_once(DIR_ROOT.'/library/Ah/Autoloader.ah.php');
+require_once(DIR_ROOT.'/library/Function.php');
 
 //Ah_Autoloader::register(array('Twig_Autoloader', 'autoload'), true);
 Ah_Autoloader::register(array('Ah_Autoloader', 'load'), true);
@@ -76,13 +76,13 @@ abstract class Ah_Application
         define('ENABLE_GZIP', !!( isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false));
         define('ENABLE_SSL',  !!( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'));
 
-        define('DIR_ACT',  DIR_ROOT.'/act');
-        define('DIR_LIB',  DIR_ROOT.'/lib');
+        define('DIR_ACT',  DIR_ROOT.'/action');
+        define('DIR_LIB',  DIR_ROOT.'/library');
         define('DIR_JS',   DIR_ROOT.'/js');
         define('DIR_LOG',  DIR_ROOT.'/log');
-        define('DIR_TMP',  DIR_ROOT.'/tmp');
-        define('DIR_TPL',  DIR_ROOT.'/tpl');
-        define('DIR_YML',  DIR_ROOT.'/yml');
+        define('DIR_TMP',  DIR_ROOT.'/cache');
+        define('DIR_TPL',  DIR_ROOT.'/template');
+        define('DIR_YML',  DIR_ROOT.'/config');
 
         // anti "magic_quotes_gpc" directive [@ref http://pentan.info/php/magic_quotes_on.html]
         if ( get_magic_quotes_gpc() ) {
