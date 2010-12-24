@@ -26,7 +26,7 @@ class View_Template extends View_Abstract
      *
      * @param string $path
      * @param string $extension
-     * @return chain
+     * @return void
      */
     public function setTpl($path, $extension)
     {
@@ -39,7 +39,6 @@ class View_Template extends View_Abstract
             // throw exception template file is not found
             $this->tpl = null;
         }
-        return $this;
     }
 
     /**
@@ -70,7 +69,7 @@ class View_Template extends View_Abstract
      * 
      * @param array $vars
      * @param null $block
-     * @return void
+     * @return chain
      */
     public function build(array &$vars, $block = null)
     {
@@ -91,12 +90,14 @@ class View_Template extends View_Abstract
         if ( $isHash === true || $isTouch === true ) {
             $this->tpl->add($block, $stack);
         }
+
+        return $this;
     }
 
     /**
      * render
      *
-     * @return chain
+     * @return string $bulidedTempalte
      */
     public function render()
     {

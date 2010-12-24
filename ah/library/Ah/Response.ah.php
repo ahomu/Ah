@@ -15,17 +15,12 @@ class Ah_Response
         $_charset   = 'UTF-8',
         $_mimetype  = 'text/html',
         $_location  = null,
-        $_status    = '200 OK',
+        $_status    = '200',
         $_body      = '';
 
-    private static $INSTANCE;
-
-    public static function getInstance()
+    public function __construct()
     {
-        if ( self::$INSTANCE === null ) {
-            self::$INSTANCE = new self();;
-        }
-        return self::$INSTANCE;
+        
     }
 
     /**
@@ -36,27 +31,38 @@ class Ah_Response
      */
     public function setStatusCode($code)
     {
-        $this->_status  = $code.' '.Ah_Response::$statusCode[$code];
+        $this->_status  = $code;
     }
 
     /**
      * getStatusCode
      *
-     * @return strint $code
+     * @return string $code
      */
     public function getStatusCode()
     {
-        return substr($this->_status, 0, 3);
+        return $this->_status;
     }
 
     /**
-     * isSetStatusCode
+     * setBody
      *
-     * @return boolean
+     * @param string $body
+     * @return void
      */
-    public function isSetStatusCode()
+    public function setBody($body)
     {
-        return !!($this->_status);
+        $this->_body = $body;
+    }
+
+    /**
+     * getBody
+     *
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->_body;
     }
 
     /**
@@ -104,34 +110,25 @@ class Ah_Response
     }
 
     /**
-     * setBody
-     *
-     * @param string $body
-     * @return void
-     */
-    public function setBody($body)
-    {
-        $this->_body = $body;
-    }
-
-    /**
      * send
      *
      * @param string $body
      * @return void
      */
-    public function send($body = null)
+    public function send()
     {
-        if ( $body !== null ) {
-            $this->_body = $body;
-        }
-
-        header("HTTP/{$this->_version} {$this->_status}");
+        header(sprintf('HTTP/%s %s %s',
+                       $this->_version,
+                       $this->_status,
+                       Ah_Response::$statusCode[$this->_status]
+               ));
         header("Content-Type: {$this->_mimetype}; charset={$this->_charset}");
 
         if ( $this->_location !== null ) header("Location: {$this->_location}");
 
+        $ob = ob_get_clean();
         print $this->_body;
+        return $ob;
     }
 
     // status code list

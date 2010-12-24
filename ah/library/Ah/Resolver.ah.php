@@ -10,6 +10,13 @@
  */
 class Ah_Resolver
 {
+    /**
+     * external
+     *
+     * @param  string $path
+     * @param  string $method
+     * @return voi ( send http response )d
+     */
     public static function external($path, $method)
     {
         // map args
@@ -30,38 +37,94 @@ class Ah_Resolver
             }
         }
 
-        self::_run($path, $method, $params, 'output');
+        return self::_run($path, $method, $params, 'output');
     }
 
+    /**
+     * internal
+     *
+     * @param string $path
+     * @param string $method
+     * @param array $params
+     * @return object $Action
+     */
     public static function internal($path, $method, $params = array())
     {
+        // map args
+        if ( empty($params) ) {
+            $params = Ah_Resolver::_argumentsMapper($path, $method);
+        }
         return self::_run($path, $method, $params, 'passing');
     }
 
+    /**
+     * includes
+     *
+     * @param string $path
+     * @param string $method
+     * @param array $params
+     * @return string $responseBody
+     */
+    public static function includes($path, $method, $params = array())
+    {
+        // map args
+        if ( empty($params) ) {
+            $params = Ah_Resolver::_argumentsMapper($path, $method);
+        }
+        return self::_run($path, $method, $params, 'printing');
+    }
+
+    /**
+     * partial - get internal uri content
+     *
+     * @param string $path
+     * @return string $staticStrings
+     */
+    public static function partial($path)
+    {
+        return '';
+    }
+
+    /**
+     * redirect - go external uri content
+     *
+     * @param string $path
+     * @retur ( send http response )n void
+     */
     public static function redirect($path)
     {
         if ( !preg_match('/^https?:\/\//', $path) ) {
             $path = (ENABLE_SSL ? 'https://' : 'http://').REQUEST_HOST.$path;
         }
 
-        $Res = Ah_Response::getInstance();
+        $Res = new Ah_Response();
         $Res->setStatusCode(303);
         $Res->setLocation($path);
-        $Res->setBody(null);
         $Res->send();
     }
 
+    /**
+     * _run
+     *
+     * @param string $path
+     * @param string $method
+     * @param array $params
+     * @param string $final
+     * @return object $Action
+     */
     private static function _run($path, $method, $params, $final)
     {
         try
         {
             $method = strtolower($method);
             $Action = Ah_Resolver::_actionDispatcher($path);
-            return $Action->params($params)->execute($method)->$final();
+
+            $Action->params($params);
+            return $Action->execute($method)->$final();
         }
         catch ( Ah_Exception_MethodNotAllowed $e )
         {
-            $Res = Ah_Response::getInstance();
+            $Res = new Ah_Response();
             $Res->setStatusCode(405);
             header('Allow: '.$e->getMessage());
             $Res->setBody(
@@ -78,7 +141,7 @@ class Ah_Resolver
         }
         catch ( Ah_Exception_NotFound $e )
         {
-            $Res = Ah_Response::getInstance();
+            $Res = new Ah_Response();
             $Res->setStatusCode(404);
             $Res->setBody(
                  '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
@@ -92,8 +155,18 @@ class Ah_Resolver
             );
             $Res->send();
         }
+        catch ( Exception $e )
+        {
+            die('Unspecified Exception: '.$e->getMessage());
+        }
     }
 
+    /**
+     * _actionDispatcher
+     *
+     * @param  $path
+     * @return object $Action
+     */
     private static function _actionDispatcher($path)
     {
         $chunks = explode('/', strtolower($path));
@@ -109,9 +182,21 @@ class Ah_Resolver
 
         class_exists($actionName);
         $Action = new $actionName();
+
+        if ( !$Action instanceof Action_Interface ) {
+            throw new Exception('Calling '.$actionName.' class does not implement Action_Interface.');
+        }
+
         return $Action;
     }
 
+    /**
+     * _argumentsMapper
+     *
+     * @param string $rawPath
+     * @param string $method
+     * @return array $args
+     */
     private static function _argumentsMapper(& $rawPath, $method)
     {
         $map = Ah_Config::load('map', 'arguments_mapper');

@@ -31,4 +31,11 @@ interface Action_Interface
      * @return object $this
      */
     public function passing();
+
+    /**
+     * printing
+     *
+     * @return string $responseBody
+     */
+    public function printing();
 }

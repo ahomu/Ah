@@ -18,7 +18,7 @@
 
 define('DIR_ROOT', dirname(__FILE__));
 
-//require_once(DIR_ROOT.'/lib/Class/Twig/Autoloader.php');
+//require_once(DIR_ROOT.'/lib/Vendor/Twig/Autoloader.php');
 require_once(DIR_ROOT.'/library/Ah/Autoloader.ah.php');
 require_once(DIR_ROOT.'/library/Function.php');
 
@@ -52,6 +52,10 @@ abstract class Ah_Application
             ini_set('log_errors', 1);
             ini_set('error_log', './error_log');
         }
+
+        // output buffering
+        ob_start();
+        ob_implicit_flush(0);
 
         // set internal encoding
         mb_internal_encoding('UTF-8');

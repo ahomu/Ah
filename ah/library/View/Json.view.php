@@ -8,11 +8,12 @@ class View_Json extends View_Abstract
      * build
      *
      * @param  $vars
-     * @return void
+     * @return chain
      */
     public function build($vars)
     {
         $this->_json = json_encode($vars);
+        return $this;
     }
 
     /**

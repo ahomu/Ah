@@ -17,25 +17,25 @@ abstract class Action_Abstract
      */
     public function __construct()
     {
-        $this->Response = Ah_Response::getInstance();
+        $this->Response = new Ah_Response();
     }
 
     /**
      * params
      *
      * @param array $params
-     * @return chain
+     * @return void
      */
     public function params($params)
     {
         $this->Params = new Ah_Params($this->_receive_params, $params);
         $this->Params->validate($this->_validate_condition, Ah_Validator::getInstance());
-        return $this;
     }
 
     /**
      * execute
      *
+     * @param string $method
      * @return chain
      */
     public function execute($method)
@@ -57,15 +57,11 @@ abstract class Action_Abstract
     /**
      * output
      *
-     * @return void
+     * @return void ( send http response )
      */
     public function output()
     {
-        if ( is_object($this->View) && method_exists($this->View, 'render') ) {
-            $this->Response->send($this->View->render());
-        } else {
-            $this->Response->send();
-        }
+        return $this->Response->send();
     }
 
     /**
@@ -76,5 +72,15 @@ abstract class Action_Abstract
     public function passing()
     {
         return $this;
+    }
+
+    /**
+     * printing
+     *
+     * @return string $responseBody
+     */
+    public function printing()
+    {
+        return $this->Response->getBody();
     }
 }
