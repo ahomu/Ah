@@ -13,12 +13,6 @@ class Ah_Debug_ErrorTrace
     private static
         $_store;
 
-    public static function ready()
-    {
-        Ah_Event_Helper::getDispatcher()->listen('error.regular', array('Ah_Debug_ErrorTrace', 'regular'));
-        Ah_Event_Helper::getDispatcher()->listen('app.shutdown', array('Ah_Debug_ErrorTrace', 'fatal'));
-    }
-
     public static function regular($errorInfo)
     {
         list($errno, $errstr, $errfile, $errline, $stacks) = $errorInfo;

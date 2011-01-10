@@ -21,7 +21,7 @@ class Ah_Event_Dispatcher
      * @param  $callable
      * @return void
      */
-    public function listen($event, $callable, $params = array())
+    public function listen($event, $callable)
     {
         if ( empty($this->_listeners[$event]) ) {
             $this->_listeners[$event] = array();
