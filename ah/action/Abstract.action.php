@@ -36,7 +36,7 @@ abstract class Action_Abstract
      * execute
      *
      * @param string $method
-     * @return chain
+     * @return void
      */
     public function execute($method)
     {
@@ -51,21 +51,22 @@ abstract class Action_Abstract
 
             throw new Ah_Exception_MethodNotAllowed(strtoupper(implode(', ', $allows)));
         }
-        return $this->$method();
+
+        $this->$method();
     }
 
     /**
-     * output
+     * output ( call from Ah_Resolver::external )
      *
      * @return void ( send http response )
      */
     public function output()
     {
-        return $this->Response->send();
+        $this->Response->send();
     }
 
     /**
-     * passing
+     * passing ( call from Ah_Resolver::internal )
      *
      * @return object $this
      */
@@ -75,7 +76,7 @@ abstract class Action_Abstract
     }
 
     /**
-     * printing
+     * printing ( call from Ah_Resolver::includes )
      *
      * @return string $responseBody
      */

@@ -18,11 +18,9 @@
 
 define('DIR_ROOT', dirname(__FILE__));
 
-//require_once(DIR_ROOT.'/lib/Vendor/Twig/Autoloader.php');
 require_once(DIR_ROOT.'/library/Ah/Autoloader.ah.php');
 require_once(DIR_ROOT.'/library/Function.php');
 
-//Ah_Autoloader::register(array('Twig_Autoloader', 'autoload'), true);
 Ah_Autoloader::register(array('Ah_Autoloader', 'load'), true);
 
 /**
@@ -37,25 +35,7 @@ abstract class Ah_Application
 {
     public static function initialize($isDebug)
     {
-        // is DEBUG?
-        define('DEBUG_MODE', $isDebug);
-
-        // initialize error report
-        if ( !!DEBUG_MODE ) {
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
-            ini_set('log_errors', 1);
-            ini_set('error_log', './error_log');
-        } else {
-            error_reporting(E_ALL);
-            ini_set('display_errors', 0);
-            ini_set('log_errors', 1);
-            ini_set('error_log', './error_log');
-        }
-
-        // output buffering
-        ob_start();
-        ob_implicit_flush(0);
+        Ah_Event_Helper::getDispatcher()->notify(null, 'app.startup');
 
         // set internal encoding
         mb_internal_encoding('UTF-8');
@@ -74,8 +54,8 @@ abstract class Ah_Application
         define('REQUEST_URI', $_SERVER['REQUEST_URI']);
         define('REQUEST_METHOD', $_SERVER['REQUEST_METHOD']);
 
-        define('IP_SERVER', $_SERVER['SERVER_ADDR']);
         define('IP_CLIENT', $_SERVER['REMOTE_ADDR']);
+        define('IP_SERVER', $_SERVER['SERVER_ADDR']);
 
         define('ENABLE_GZIP', !!( isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false));
         define('ENABLE_SSL',  !!( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'));
@@ -95,5 +75,36 @@ abstract class Ah_Application
             $_REQUEST = array_walk_recursive($_REQUEST, 'stripslashes');
             $_COOKIE  = array_walk_recursive($_COOKIE, 'stripslashes');
         }
+
+        // is DEBUG?
+        define('DEBUG_MODE', $isDebug);
+
+        // initialize error report
+        if ( !!DEBUG_MODE ) {
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            ini_set('log_errors', 1);
+            ini_set('error_log', './error_log');
+
+            Ah_Debug_ErrorTrace::ready();
+        } else {
+            error_reporting(E_ALL);
+            ini_set('display_errors', 0);
+            ini_set('log_errors', 1);
+            ini_set('error_log', './error_log');
+        }
+
+        // error event
+        set_error_handler(function($errno, $errstr, $errfile, $errline)
+        {
+            $stacks = debug_backtrace();
+            Ah_Event_Helper::getDispatcher()->notify(array($errno, $errstr, $errfile, $errline, $stacks), 'error.regular');
+        }, E_ALL);
+
+        // shutdown event
+        register_shutdown_function(function()
+        {
+            Ah_Event_Helper::getDispatcher()->notify(null, 'app.shutdown');
+        });
     }
 }

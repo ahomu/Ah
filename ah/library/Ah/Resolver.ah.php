@@ -75,17 +75,6 @@ class Ah_Resolver
     }
 
     /**
-     * partial - get internal uri content
-     *
-     * @param string $path
-     * @return string $staticStrings
-     */
-    public static function partial($path)
-    {
-        return '';
-    }
-
-    /**
      * redirect - go external uri content
      *
      * @param string $path
@@ -120,7 +109,9 @@ class Ah_Resolver
             $Action = Ah_Resolver::_actionDispatcher($path);
 
             $Action->params($params);
-            return $Action->execute($method)->$final();
+            $Action->execute($method);
+
+            return $Action->$final();
         }
         catch ( Ah_Exception_MethodNotAllowed $e )
         {

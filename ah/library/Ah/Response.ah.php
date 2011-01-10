@@ -117,18 +117,29 @@ class Ah_Response
      */
     public function send()
     {
+        // first version & response code
         header(sprintf('HTTP/%s %s %s',
                        $this->_version,
                        $this->_status,
                        Ah_Response::$statusCode[$this->_status]
                ));
-        header("Content-Type: {$this->_mimetype}; charset={$this->_charset}");
 
-        if ( $this->_location !== null ) header("Location: {$this->_location}");
+        if ( $this->_location !== null )
+        {
+            // redirect location
+            header("Location: {$this->_location}");
+        }
+        else
+        {
+            // MIME type & charset
+            header("Content-Type: {$this->_mimetype}; charset={$this->_charset}");
 
-        $ob = ob_get_clean();
+            // disable MIME sniffing of IE8
+            header("X-Content-Type-Options: nosniff");
+        }
+
+        Ah_Debug_ErrorTrace::stack(ob_get_clean());
         print $this->_body;
-        return $ob;
     }
 
     // status code list

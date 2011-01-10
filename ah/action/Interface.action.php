@@ -6,7 +6,7 @@ interface Action_Interface
      * params
      *
      * @param array $params
-     * @return chain
+     * @return void
      */
     public function params($params);
 
@@ -14,7 +14,7 @@ interface Action_Interface
      * exectute
      *
      * @param string $method
-     * @return chain
+     * @return void
      */
     public function execute($method);
 

@@ -75,7 +75,7 @@ class Ah_Params
      * @param object $Validator
      * @return void
      */
-    public function validate($condition, $Validator)
+    public function validate($condition, Ah_Validator $Validator)
     {
         $this->_meta['validate'] = $Validator->validate($condition, $this->_params);
     }
