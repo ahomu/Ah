@@ -2,7 +2,7 @@
 
 /* * * * * * * * * * * * * * * * * * * * * * *
  *
- * "Ah" - Action Highway / PHP Application Framework
+ * "Ah" - PHP Application Framework
  *
  * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -45,6 +45,9 @@ abstract class Ah_Application
         // #EVENT startup
         Ah_Event_Helper::getDispatcher()->notify(null, 'app.startup');
 
+        // is DEBUG?
+        define('DEBUG_MODE', $isDebug);
+
         // output buffering
         ob_start();
         ob_implicit_flush(false);
@@ -79,9 +82,6 @@ abstract class Ah_Application
             $_REQUEST = array_walk_recursive($_REQUEST, 'stripslashes');
             $_COOKIE  = array_walk_recursive($_COOKIE, 'stripslashes');
         }
-
-        // is DEBUG?
-        define('DEBUG_MODE', $isDebug);
 
         // initialize error report
         if ( !!DEBUG_MODE ) {

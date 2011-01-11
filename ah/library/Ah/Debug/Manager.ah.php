@@ -10,9 +10,23 @@
  */
 class Ah_Debug_Manager
 {
+    /**
+     * ready
+     *
+     * @return void
+     */
     public static function ready()
     {
-        Ah_Event_Helper::getDispatcher()->listen('error.regular', array('Ah_Debug_ErrorTrace', 'regular'));
-        Ah_Event_Helper::getDispatcher()->listen('app.shutdown', array('Ah_Debug_ErrorTrace', 'fatal'));
+        header('Cache-Control: private');
+
+        $Config = Ah_Config::load('debug');
+
+        if ( $Config['ErrorTracer']['enable'] === 'true' )
+        {
+            Ah_Event_Helper::getDispatcher()->listen('error.regular', array('Ah_Debug_Tracer', 'regularError'));
+        }
+
+        Ah_Event_Helper::getDispatcher()->listen('response.send_before', array('Ah_Debug_Renderer', 'addOb'));
+        Ah_Event_Helper::getDispatcher()->listen('response.send_before', array('Ah_Debug_Renderer', 'dump'));
     }
 }

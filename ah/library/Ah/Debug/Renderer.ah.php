@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Ah_Debug_ErrorTrace
+ * Ah_Debug_Renderer
  *
  * @package     Ah
  * @subpackage  Debug
@@ -8,56 +9,66 @@
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Debug_ErrorTrace
+class Ah_Debug_Renderer
 {
     private static
         $_store;
 
-    public static function regular($errorInfo)
+    /**
+     * add
+     *
+     * @param  $ob
+     * @return void
+     */
+    public static function add($ob)
     {
-        list($errno, $errstr, $errfile, $errline, $stacks) = $errorInfo;
-
-        $ob ="$errno $errstr in $errfile on line $errline";
-
-        $ob.='<table class="ah_debug_trace-log_stack">';
-        $ob.='<tr><th>class</th><th>function</th><th>file (line)</th></tr>';
-        foreach ( $stacks as $stack ) {
-            if ( empty($stack['class']) ) $stack['class'] = '-';
-
-            extract($stack, EXTR_PREFIX_ALL, '');
-            $ob.="<tr><td>$_class</td><td>$_function</td><td>$_file ($_line)</td></tr>";
+        if ( is_string($ob) ) {
+            self::$_store .= $ob;
         }
-        $ob.= '</table>';
-
-        Ah_Debug_ErrorTrace::stack($ob);
     }
 
-    public static function fatal()
+    /**
+     * addOb
+     *
+     * @return void
+     */
+    public static function addOb()
     {
-        Ah_Debug_ErrorTrace::stack(ob_get_clean());
-        Ah_Debug_ErrorTrace::dump();
+        self::$_store .= ob_get_clean();
     }
 
-    public static function stack($ob)
-    {
-        Ah_Debug_ErrorTrace::$_store .= $ob;
-    }
-
+    /**
+     * clean
+     *
+     * @return string $ob
+     */
     public static function clean()
     {
-        $ob = Ah_Debug_ErrorTrace::$_store;
-        Ah_Debug_ErrorTrace::$_store = null;
+        $ob = self::$_store;
+        self::$_store = null;
         return $ob;
     }
 
+    /**
+     * dump
+     *
+     * @return void
+     */
     public static function dump()
     {
-        $ob = Ah_Debug_ErrorTrace::clean();
+        $ob = self::clean();
+
         if ( !empty($ob) ) {
-            echo Ah_Debug_ErrorTrace::getStyle();
+            echo self::getStyle();
             echo '<pre id="ah_debug_trace-log">'.$ob.'</pre>';
         }
     }
+
+    /**
+     * getStyle
+     *
+     * @return string
+     */
     public static function getStyle()
     {
 return  <<< DOC_END

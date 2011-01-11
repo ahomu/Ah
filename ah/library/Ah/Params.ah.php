@@ -116,7 +116,7 @@ class Ah_Params
     /**
      * toArray
      *
-     * @return array|null
+     * @return mixed array|null
      */
     public function toArray()
     {

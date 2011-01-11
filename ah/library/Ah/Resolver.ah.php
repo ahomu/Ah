@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ah_Resolver
+ * Ah_Resolver provides URI routing and resolve request.
  *
  * @package     Ah
  * @copyright   2010 ayumusato.com
@@ -11,7 +11,7 @@
 class Ah_Resolver
 {
     /**
-     * external
+     * external - external action and send response
      *
      * @param  string $path
      * @param  string $method
@@ -41,7 +41,7 @@ class Ah_Resolver
     }
 
     /**
-     * internal
+     * internal - internal action and get executed action instance
      *
      * @param string $path
      * @param string $method
@@ -58,7 +58,7 @@ class Ah_Resolver
     }
 
     /**
-     * includes
+     * includes - internal action and get response body
      *
      * @param string $path
      * @param string $method
@@ -78,10 +78,14 @@ class Ah_Resolver
      * redirect - go external uri content
      *
      * @param string $path
+     * @param array $params get query params
      * @retur ( send http response )n void
      */
-    public static function redirect($path)
+    public static function redirect($path, $params = array())
     {
+        if ( !empty($params) ) {
+            $path .= '?'.http_build_query($params);
+        }
         if ( !preg_match('/^https?:\/\//', $path) ) {
             $path = (ENABLE_SSL ? 'https://' : 'http://').REQUEST_HOST.$path;
         }
@@ -108,8 +112,17 @@ class Ah_Resolver
             $method = strtolower($method);
             $Action = Ah_Resolver::_actionDispatcher($path);
 
+            // set params
             $Action->params($params);
+
+            // #EVENT action before
+            Ah_Event_Helper::getDispatcher()->notify($Action, 'resolver.action_before');
+
+            // action execute
             $Action->execute($method);
+
+            // #EVENT action after
+            Ah_Event_Helper::getDispatcher()->notify($Action, 'resolver.action_after');
 
             return $Action->$final();
         }

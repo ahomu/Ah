@@ -10,13 +10,17 @@
  */
 class Ah_Response
 {
+    const
+        _version    = '1.1';
+
     private
-        $_version   = '1.1',
         $_charset   = 'UTF-8',
         $_mimetype  = 'text/html',
         $_location  = null,
         $_status    = '200',
-        $_body      = '';
+        $_body      = '',
+        $_cache     = '',
+        $_nocache   = false;
 
     public function __construct()
     {
@@ -66,17 +70,6 @@ class Ah_Response
     }
 
     /**
-     * setVersion
-     *
-     * @param string $version
-     * @return void
-     */
-    public function setVersion($version)
-    {
-        $this->_version  = $version;
-    }
-
-    /**
      * setCharset
      *
      * @param string $charset
@@ -110,6 +103,28 @@ class Ah_Response
     }
 
     /**
+     * setNoCache
+     *
+     * @param bool $bool
+     * @return void
+     */
+    public function setNoCache(boolean $bool)
+    {
+        $this->_nocache = $bool;
+    }
+
+    /**
+     * setCacheControl
+     *
+     * @param string $control
+     * @return void
+     */
+    public function setCacheControl($control)
+    {
+        $this->_cache = $control;
+    }
+
+    /**
      * send
      *
      * @param string $body
@@ -119,11 +134,23 @@ class Ah_Response
     {
         // first version & response code
         header(sprintf('HTTP/%s %s %s',
-                       $this->_version,
+                       self::_version,
                        $this->_status,
-                       Ah_Response::$statusCode[$this->_status]
-               ));
+                       self::$statusCode[$this->_status]
+               )
+        );
 
+        // send response headers
+        if ( $this->_nocache === true )
+        {
+            // no nocache
+            header("Cache-Control: no-cache");
+        }
+        elseif ( !empty($this->_cache) )
+        {
+            // cache control
+            header("Cache-Control: {$this->_cache}");
+        }
         if ( $this->_location !== null )
         {
             // redirect location
@@ -134,12 +161,21 @@ class Ah_Response
             // MIME type & charset
             header("Content-Type: {$this->_mimetype}; charset={$this->_charset}");
 
+            // content length
+            header("Content-Length: ".bytelen($this->_body));
+
             // disable MIME sniffing of IE8
             header("X-Content-Type-Options: nosniff");
         }
 
-        Ah_Debug_ErrorTrace::stack(ob_get_clean());
+        // #EVENT send before
+        Ah_Event_Helper::getDispatcher()->notify($this, 'response.send_before');
+
+        // send response body
         print $this->_body;
+
+        // #EVENT send after
+        Ah_Event_Helper::getDispatcher()->notify($this, 'response.send_after');
     }
 
     // status code list
@@ -182,6 +218,7 @@ class Ah_Response
         '415'   => 'Unsupported Media Type',
         '416'   => 'Requested Range Not Satisfiable',
         '417'   => 'Expectation Failed',
+        '418'   => "I'm a teapot", // it's joke! (HTCPCP/1.0)
         '422'   => 'Unprocessable Entity',
         '423'   => 'Locked',
         '424'   => 'Failed Dependency',

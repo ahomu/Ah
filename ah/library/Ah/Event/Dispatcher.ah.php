@@ -1,7 +1,7 @@
 <?php
 /**
  * Ah_Event_Dispatcher provides object's communication method while application sequence.
- * ( reference: Symfony Component "sfEventDispatcher" )
+ * ( reference: "sfEventDispatcher" http://components.symfony-project.org/event_dispatcher/ )
  *
  * @package     Ah
  * @subpackage  Event
@@ -23,7 +23,7 @@ class Ah_Event_Dispatcher
      */
     public function listen($event, $callable)
     {
-        if ( empty($this->_listeners[$event]) ) {
+        if ( !isset($this->_listeners[$event]) ) {
             $this->_listeners[$event] = array();
         }
 
@@ -54,7 +54,7 @@ class Ah_Event_Dispatcher
      */
     public function getListeners($event)
     {
-        return $this->_listeners[$event];
+        return isset($this->_listeners[$event]) ? $this->_listeners[$event] : array();
     }
 
     /**

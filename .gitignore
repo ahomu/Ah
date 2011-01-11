@@ -4,9 +4,7 @@ index.php
 ah/action/*
 !ah/action/Abstract.action.php
 !ah/action/Interface.action.php
-ah/library/Ah/Debug/
 ah/library/Ah/Test/
-ah/library/Ah/Hook.ah.php
 ah/library/Class/API/
 ah/library/Class/Reader/
 ah/library/Class/OAuth/
