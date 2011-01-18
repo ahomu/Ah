@@ -150,41 +150,6 @@ function bytelen($data)
 }
 
 /**
- * fixEncodingAssoc
- *
- * @param mixed $val
- * @return void
- */
-function fixEncodingAssoc(& $val)
-{
-    if ( is_array($val) ) {
-        array_walk($val, 'fixEncodingAssoc');
-    } else {
-        if ( get_magic_quotes_gpc() ) $val = stripslashes($val);
-        if ( !!($enc = mb_detect_encoding($val, 'UTF-8, EUC-JP, SJIS-win')) ) {
-            $val    = mb_convert_encoding($val, 'UTF-8', $enc);
-        }
-    }
-    return true;
-}
-
-/**
- * inputEscapingAssoc
- *
- * @param mixed $val
- * @return void
- */
-function inputEscapingAssoc(& $val)
-{
-    if ( is_array($val) ) {
-        array_walk($val, 'inputEscapingAssoc');
-    } else {
-        $val    = htmlentities($val, ENT_QUOTES, 'UTF-8');
-    }
-    return true;
-}
-
-/**
  * getUnique
  *
  * @param int $length
@@ -264,6 +229,45 @@ if ( !function_exists('json_encode') ) {
     {
         $json = new Services_JSON();
         return $json->encode($content);
+    }
+}
+
+/**
+ * fixEncodingAssoc
+ *
+ * @param mixed $val
+ * @return void
+ */
+if ( !function_exists('fixEncodingAssoc') ) {
+    function fixEncodingAssoc(& $val)
+    {
+        if ( is_array($val) ) {
+            array_walk($val, 'fixEncodingAssoc');
+        } else {
+            if ( get_magic_quotes_gpc() ) $val = stripslashes($val);
+            if ( !!($enc = mb_detect_encoding($val, 'UTF-8, EUC-JP, SJIS-win')) ) {
+                $val    = mb_convert_encoding($val, 'UTF-8', $enc);
+            }
+        }
+        return true;
+    }
+}
+
+/**
+ * inputEscapingAssoc
+ *
+ * @param mixed $val
+ * @return void
+ */
+if ( !function_exists('inputEscapingAssoc') ) {
+    function inputEscapingAssoc(& $val)
+    {
+        if ( is_array($val) ) {
+            array_walk($val, 'inputEscapingAssoc');
+        } else {
+            $val    = htmlentities($val, ENT_QUOTES, 'UTF-8');
+        }
+        return true;
     }
 }
 
@@ -354,52 +358,3 @@ function var_html($obj, $get = false){
     echo $indent . $data . $return . "\n";
   }
 }
-
-/*
-function anchor($txt, $args=array())
-{
-    $type   = !empty($args[0]) ? $args[0] : 'url';
-
-    switch ($type)
-    {
-        case 'reply'    :
-            $regex      = '/(?!@{1}[a-zA-Z0-9_]+\.{1})(@{1})([a-zA-Z0-9_]+)/';
-            $url_prefix = 'http://twitter.com/';
-            $url_surfix = '';
-            $str_prefix = '@';
-            $str_surfix = '';
-            break;
-        case 'hash'     :
-            $regex      = '/(?!&#[0-9a-zA-Z]*;)(^|[^\w])#{1}([a-zA-Z0-9_]+)/';
-            $url_prefix = 'http://twitter.com/#search?q=%23';
-            $url_surfix = '';
-            $str_prefix = '#';
-            $str_surfix = '';
-            break;
-        case 'url'      :
-            $regex      = preg_replace('/^@\^(.*)\$@$/si', "@(\s)?($1)@", REGEX_VALID_URL);
-            $url_prefix = '';
-            $url_surfix = '';
-            $str_prefix = '';
-            $str_surfix = '';
-            break;
-    }
-
-    preg_match_all($regex, $txt, $matches);
-
-    if ( empty($matches[2]) ) return $txt;
-
-    foreach ( $matches[2] as $match ) {
-        $url    = $url_prefix.$match.$url_surfix;
-        $str    = $str_prefix.$match.$str_surfix;
-        $pair[$str]  = '<a href="'.$url.'">'.$str.'</a>';
-    }
-
-    $pair   = array_unique($pair);
-    $raw    = array_keys($pair);
-    $anker  = array_values($pair);
-
-    $txt    = str_replace($raw, $anker, $txt);
-    return $txt;
-}
-*/
