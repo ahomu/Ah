@@ -24,7 +24,8 @@ class Ah_Params
      */
     public function __construct($allows, $params)
     {
-        // excpetion memo: are not array
+        // TODO exception: $params isHash?
+        // TODO exception: $allows, $params are empty?
         if ( !is_array($allows) ) $allows = array();
         if ( !is_array($params) ) $params = array();
 
@@ -75,9 +76,9 @@ class Ah_Params
      * @param object $Validator
      * @return void
      */
-    public function validate($condition, Ah_Validator $Validator)
+    public function validate($rule, Ah_Validator $Validator)
     {
-        $this->_meta['validate'] = $Validator->validate($condition, $this->_params);
+        $this->_meta['validate'] = $Validator->validate($rule, $this->_params);
     }
 
     /**
@@ -87,6 +88,7 @@ class Ah_Params
      */
     public function isValidAll()
     {
+        // TODO exception: validation not yet
         if ( empty($this->_meta['validate']) ) return true;
 
         foreach ( $this->_meta['validate'] as $row ) {
