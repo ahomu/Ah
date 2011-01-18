@@ -15,7 +15,7 @@ class Ah_Resolver
      *
      * @param  string $path
      * @param  string $method
-     * @return voi ( send http response )d
+     * @return void ( send http response )
      */
     public static function external($path, $method)
     {
