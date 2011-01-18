@@ -29,7 +29,7 @@ class Ah_Validator extends Ah_ValidateDecorator
      * @param array $params
      * @return array $result
      */
-    public function validate($condition, $params)
+    public function validate($rule, $params)
     {
         $this->_temporary = $params;
         $result           = array();
@@ -38,9 +38,9 @@ class Ah_Validator extends Ah_ValidateDecorator
             // $param = paramator name
             // $val   = paramator value
 
-            if ( empty($condition[$param]) ) continue;
+            if ( empty($rule[$param]) ) continue;
 
-            foreach ( $condition[$param] as $method => $args_or_method ) {
+            foreach ( $rule[$param] as $method => $args_or_method ) {
                 if ( is_int($method) ) { 
                     $method = $args_or_method;
                     $args   = array();
@@ -118,6 +118,11 @@ class Ah_Validator extends Ah_ValidateDecorator
     protected function required($val)
     {
         return ( !empty($val) || ('0' === @$val) );
+    }
+
+    protected function notNull($val)
+    {
+        return !is_null($val);
     }
 
     protected function min($val, $args)

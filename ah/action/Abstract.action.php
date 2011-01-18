@@ -8,7 +8,7 @@ abstract class Action_Abstract
 
     protected
         $_receive_params,
-        $_validate_condition;
+        $_validate_rule;
 
     /**
      * __construct
@@ -29,7 +29,7 @@ abstract class Action_Abstract
     public function params($params)
     {
         $this->Params = new Ah_Params($this->_receive_params, $params);
-        $this->Params->validate($this->_validate_condition, Ah_Validator::getInstance());
+        $this->Params->validate($this->_validate_rule, Ah_Validator::getInstance());
     }
 
     /**
