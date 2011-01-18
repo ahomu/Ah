@@ -31,7 +31,14 @@ class Ah_Cache
 
     public static function save($realPath, $content, $ns = null)
     {
-        return file_put_contents(self::_getPath($realPath, $ns), $content);
+        $cachePath = self::_getPath($realPath, $ns);
+
+        $dirPath   = preg_replace('/(\/\w+)$/', '', $cachePath);
+        if ( !file_exists($dirPath) ) {
+            mkdir($dirPath);
+        }
+
+        return file_put_contents($cachePath, $content);
     }
 
     private static function _getPath($realPath, $ns = null)

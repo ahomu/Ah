@@ -28,11 +28,19 @@ class Ah_Config
                 self::$RAM[$key] = unserialize(Ah_Cache::load($ymlPath, 'config'));
             } else {
                 self::$RAM[$key] = Spyc::YAMLLoad($ymlPath);
-                Ah_Cache::save($ymlPath, serialize(self::$RAM[$key]), 'config');
+                if ( !empty(self::$RAM[$key]) )
+                {
+                    Ah_Cache::save($ymlPath, serialize(self::$RAM[$key]), 'config');
+                }
             }
         }
+
         if ( $needle !== null ) {
-            return self::$RAM[$key][$needle];
+            if ( !empty(self::$RAM[$key][$needle]) ) {
+                return self::$RAM[$key][$needle];
+            } else {
+                return false;
+            }
         } else {
             return self::$RAM[$key];
         }

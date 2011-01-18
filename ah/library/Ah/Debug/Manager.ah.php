@@ -19,11 +19,12 @@ class Ah_Debug_Manager
     {
         header('Cache-Control: private');
 
-        $Config = Ah_Config::load('debug');
-
-        if ( $Config['ErrorTracer']['enable'] === 'true' )
+        if ( $Config = Ah_Config::load('debug') )
         {
-            Ah_Event_Helper::getDispatcher()->listen('error.regular', array('Ah_Debug_Tracer', 'regularError'));
+            if ( $Config['ErrorTracer']['enable'] === 'true' )
+            {
+                Ah_Event_Helper::getDispatcher()->listen('error.regular', array('Ah_Debug_Tracer', 'regularError'));
+            }
         }
 
         Ah_Event_Helper::getDispatcher()->listen('response.send_before', array('Ah_Debug_Renderer', 'addOb'));

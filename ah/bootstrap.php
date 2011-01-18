@@ -40,13 +40,12 @@ Ah_Autoloader::register(array('Ah_Autoloader', 'load'), true);
  */
 abstract class Ah_Application
 {
-    public static function initialize($isDebug)
+    public static function initialize($isDebug = false)
     {
         // #EVENT startup
         Ah_Event_Helper::getDispatcher()->notify(null, 'app.startup');
 
         // is DEBUG?
-        define('DEBUG_MODE', $isDebug);
 
         // output buffering
         ob_start();
@@ -72,6 +71,7 @@ abstract class Ah_Application
         define('IP_CLIENT', $_SERVER['REMOTE_ADDR']);
         define('IP_SERVER', $_SERVER['SERVER_ADDR']);
 
+        define('ENABLE_DEBUG', $isDebug);
         define('ENABLE_GZIP', !!( isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false));
         define('ENABLE_SSL',  !!( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'));
 
@@ -84,7 +84,7 @@ abstract class Ah_Application
         }
 
         // initialize error report
-        if ( !!DEBUG_MODE ) {
+        if ( !!ENABLE_DEBUG ) {
             error_reporting(E_ALL);
             ini_set('display_errors', 1);
             ini_set('log_errors', 1);

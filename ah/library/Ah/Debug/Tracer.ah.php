@@ -25,7 +25,10 @@ class Ah_Debug_Tracer
         $ob.='<table class="ah_debug_trace-log_stack">';
         $ob.='<tr><th>class</th><th>function</th><th>file (line)</th></tr>';
         foreach ( $stacks as $stack ) {
-            if ( empty($stack['class']) ) $stack['class'] = '-';
+            if ( empty($stack['class']) )   $stack['class'] = '-';
+            if ( empty($stack['function']) )$stack['function'] = '-';
+            if ( empty($stack['file']) )    $stack['file'] = '-';
+            if ( empty($stack['line']) )    $stack['line'] = '-';
 
             extract($stack, EXTR_PREFIX_ALL, '');
             $ob.="<tr><td>$_class</td><td>$_function</td><td>$_file ($_line)</td></tr>";

@@ -60,7 +60,7 @@ class Ah_Debug_Renderer
 
         if ( !empty($ob) ) {
             echo self::getStyle();
-            echo '<pre id="ah_debug_trace-log">'.$ob.'</pre>';
+            echo '<pre id="ah_debug_trace-log">'.$ob.'</pre>'."\r\n";
         }
     }
 
@@ -72,7 +72,6 @@ class Ah_Debug_Renderer
     public static function getStyle()
     {
 return  <<< DOC_END
-
 <style type="text/css">
 pre#ah_debug_trace-log {
     font-size: 13px;
