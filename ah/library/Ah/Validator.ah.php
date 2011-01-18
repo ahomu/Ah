@@ -201,8 +201,3 @@ class Ah_Validator extends Ah_ValidateDecorator
         return is_date($val, $opt);
     }
 }
-
-class Ah_ValidateDecorator
-{
-    
-}

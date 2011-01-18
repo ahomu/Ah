@@ -1,19 +1,6 @@
 <?php
 
 /**
- * dump
- *
- * @param mixed $input
- * @return void
- */
-function d($input)
-{
-    echo '<pre>';
-    print_r($input);
-    echo '</pre>';
-}
-
-/**
  * array_clean
  * http://d.hatena.ne.jp/H6K/20090601/p1
  *
@@ -275,7 +262,7 @@ if ( !function_exists('json_encode') ) {
  * @param boolean $get
  * @return output|string
  */
-function var_html($obj, $get = false){
+function d($obj, $get = false){
   $space = ' ';
   $indent = '　';
   $return = "<br />";
