@@ -19,8 +19,6 @@
 define('DIR_ROOT', dirname(__FILE__));
 define('DIR_ACT',  DIR_ROOT.'/action');
 define('DIR_LIB',  DIR_ROOT.'/library');
-define('DIR_JS',   DIR_ROOT.'/js');
-define('DIR_LOG',  DIR_ROOT.'/log');
 define('DIR_TMP',  DIR_ROOT.'/cache');
 define('DIR_TPL',  DIR_ROOT.'/template');
 define('DIR_YML',  DIR_ROOT.'/config');
@@ -44,8 +42,6 @@ abstract class Ah_Application
     {
         // #EVENT startup
         Ah_Event_Helper::getDispatcher()->notify(null, 'app.startup');
-
-        // is DEBUG?
 
         // output buffering
         ob_start();

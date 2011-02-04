@@ -169,13 +169,13 @@ class Ah_Response
         }
 
         // #EVENT send before
-        Ah_Event_Helper::getDispatcher()->notify($this, 'response.send_before');
+        Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject($this, 'response.send_before'));
 
         // send response body
         print $this->_body;
 
         // #EVENT send after
-        Ah_Event_Helper::getDispatcher()->notify($this, 'response.send_after');
+        Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject($this, 'response.send_after'));
     }
 
     // status code list

@@ -18,7 +18,7 @@ class Ah_Debug_Tracer
      */
     public static function regularError($errorInfo)
     {
-        list($errno, $errstr, $errfile, $errline, $stacks) = $errorInfo;
+        list($errno, $errstr, $errfile, $errline, $stacks) = $errorInfo->getSubject();
 
         $ob ="$errno $errstr in $errfile on line $errline";
 

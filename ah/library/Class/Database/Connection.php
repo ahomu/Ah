@@ -5,13 +5,13 @@ class Database_Connection
     private static $_connections;
 
     /**
-     * get
+     * establish
      *
      * @param array $dsn
      * @param string $connection_id
      * @return object $_connections[$connection_id]
      */
-    public static function get($dsn, $connection_id = '__default__')
+    public static function establish($dsn, $connection_id = '__default__')
     {
         if ( !isset(self::$_connections[$connection_id]) )
         {

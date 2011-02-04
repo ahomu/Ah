@@ -75,7 +75,7 @@ class Ah_Resolver
     }
 
     /**
-     * redirect - go external uri content
+     * redirect - go external uri
      *
      * @param string $path
      * @param array $params get query params
@@ -97,7 +97,7 @@ class Ah_Resolver
     }
 
     /**
-     * _run
+     * _run - run action
      *
      * @param string $path
      * @param string $method
@@ -107,6 +107,7 @@ class Ah_Resolver
      */
     private static function _run($path, $method, $params, $final)
     {
+        // TODO : 例外時の処理を外に出す
         try
         {
             $method = strtolower($method);
@@ -116,13 +117,13 @@ class Ah_Resolver
             $Action->params($params);
 
             // #EVENT action before
-            Ah_Event_Helper::getDispatcher()->notify($Action, 'resolver.action_before');
+            Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject($Action, 'resolver.action_before'));
 
             // action execute
             $Action->execute($method);
 
             // #EVENT action after
-            Ah_Event_Helper::getDispatcher()->notify($Action, 'resolver.action_after');
+            Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject($Action, 'resolver.action_after'));
 
             return $Action->$final();
         }
@@ -177,14 +178,13 @@ class Ah_Resolver
         $stacks = array('Action');
 
         foreach ( $chunks as $chunk ) {
-            if ( empty($chunk) ) continue;
-            $stacks[]   = ucwords($chunk);
+            if ( $chunk === '' ) continue;
+            $stacks[] = ucfirst($chunk);
         }
 
         if ( count($stacks) === 1 ) $stacks[] = 'Index';
         $actionName = implode('_', $stacks);
 
-        class_exists($actionName);
         $Action = new $actionName();
 
         if ( !$Action instanceof Action_Interface ) {
@@ -210,15 +210,17 @@ class Ah_Resolver
             if ( strpos($rawPath, $path) === 0 ) {
                 $chunks = explode('/', substr($rawPath, strlen($path)));
 
-                // スラッシュで生まれる空白を詰める
+                // remove blank
                 $chunks = array_clean($chunks);
 
-                // 小さい方の数を選択
+                // adjust samller length
                 $count  = min(array(count($args), count($chunks)));
 
-                // 選択数の分だけ切り出す
-                $chunks = array_slice($chunks, 0, $count);
+                // key
                 $args   = array_slice($args, 0, $count);
+
+                // value
+                $chunks = array_slice($chunks, 0, $count);
 
                 if ( empty($args) || empty($chunks) ) return array();
 

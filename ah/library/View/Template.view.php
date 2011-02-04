@@ -79,7 +79,6 @@ class View_Template extends View_Abstract
 
         foreach ( $vars as $key => $val ) {
             if ( is_array($val) ) {
-                // isHash? || 旧メモ(前提条件として連想配列のkeyにintが使われないこと)
                 // hashでなければ、loop等と見なして親ブロックを固定
                 $key = ($isHash === false) ? $block : $key;
                 $this->build($val, $key);

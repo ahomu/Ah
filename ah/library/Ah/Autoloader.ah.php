@@ -57,9 +57,9 @@ class Ah_Autoloader
 
         $classPath  = implode('/', $pathStack)."$compType.php";
         if ( is_readable($classPath) ) {
-            include($classPath);
+            require_once($classPath);
         } else {
-            throw new Ah_Exception_NotFound($className);
+//            throw new Ah_Exception_NotFound($className);
         }
     }
 }

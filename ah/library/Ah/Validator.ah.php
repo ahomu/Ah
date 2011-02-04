@@ -25,7 +25,7 @@ class Ah_Validator extends Ah_ValidateDecorator
     /**
      * validate
      *
-     * @param array $condition_hash
+     * @param array $validate_rule
      * @param array $params
      * @return array $result
      */

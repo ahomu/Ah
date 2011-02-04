@@ -23,11 +23,11 @@ class Ah_Debug_Manager
         {
             if ( $Config['ErrorTracer']['enable'] === 'true' )
             {
-                Ah_Event_Helper::getDispatcher()->listen('error.regular', array('Ah_Debug_Tracer', 'regularError'));
+                Ah_Event_Helper::getDispatcher()->connect('error.regular', array('Ah_Debug_Tracer', 'regularError'));
             }
         }
 
-        Ah_Event_Helper::getDispatcher()->listen('response.send_before', array('Ah_Debug_Renderer', 'addOb'));
-        Ah_Event_Helper::getDispatcher()->listen('response.send_before', array('Ah_Debug_Renderer', 'dump'));
+        Ah_Event_Helper::getDispatcher()->connect('response.send_before', array('Ah_Debug_Renderer', 'addOb'));
+        Ah_Event_Helper::getDispatcher()->connect('response.send_before', array('Ah_Debug_Renderer', 'dump'));
     }
 }
