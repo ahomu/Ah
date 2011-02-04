@@ -12,7 +12,7 @@ class Ah_Session extends ArrayObject implements IteratorAggregate
 {
     private static $INSTANCE;
 
-    public static function getInstance()
+    public static function singleton()
     {
         if ( self::$INSTANCE === null ) {
             self::$INSTANCE = new self();
