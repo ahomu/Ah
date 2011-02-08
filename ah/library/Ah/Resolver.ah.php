@@ -107,7 +107,7 @@ class Ah_Resolver
      */
     private static function _run($path, $method, $params, $final)
     {
-        // TODO : 例外時の処理を外に出す
+        // TODO task: 例外時の処理を外に出す
         try
         {
             $method = strtolower($method);
@@ -131,7 +131,7 @@ class Ah_Resolver
         {
             $Res = new Ah_Response();
             $Res->setStatusCode(405);
-            header('Allow: '.$e->getMessage());
+            $Res->setHeader('Allow', $e->getMessage());
             $Res->setBody(
                  '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
                 .'<html><head>'
@@ -143,7 +143,7 @@ class Ah_Resolver
                 .'</body></html>'
             );
             $Res->send();
-        }
+        } 
         catch ( Ah_Exception_NotFound $e )
         {
             $Res = new Ah_Response();

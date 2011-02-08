@@ -8,6 +8,7 @@
  * @license     MIT License
  * @author      Ayumu Sato
  */
+// TODO issue: ユーザー拡張のエンドポイントを考える
 class Ah_Autoloader
 {
     static public $path = array();
@@ -25,7 +26,6 @@ class Ah_Autoloader
     /**
      * load
      *
-     * @throws Ah_Exception_Resolver
      * @param  string $className
      * @return void
      */
@@ -58,8 +58,33 @@ class Ah_Autoloader
         $classPath  = implode('/', $pathStack)."$compType.php";
         if ( is_readable($classPath) ) {
             require_once($classPath);
-        } else {
-//            throw new Ah_Exception_NotFound($className);
         }
+    }
+
+    /**
+     * sfLoad
+     *
+     * @param  $className
+     * @return void
+     */
+    public static function sfLoad($className)
+    {
+        $classPath = DIR_LIB.'/Vendor/sf/'.$className.'.php';
+
+        if ( is_readable($classPath) ) {
+            require_once($classPath);
+        }
+    }
+
+    /**
+     * terminate
+     *
+     * @throws Ah_Exception_NotFound
+     * @param  $className
+     * @return void
+     */
+    public static function terminate($className)
+    {
+        throw new Ah_Exception_NotFound($className);
     }
 }

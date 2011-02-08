@@ -8,7 +8,8 @@
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Validator extends Ah_ValidateDecorator
+// TODO issue: ユーザー拡張のエンドポイントを考える
+class Ah_Validator
 {
     private static $INSTANCE;
 

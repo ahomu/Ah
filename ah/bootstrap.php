@@ -14,6 +14,9 @@
  *     /lib/Class/Spyc.class.php
  * Template
  *     /lib/Class/Template.class.php
+ * sfEventDispatcher
+ *     /lib/Vendor/sf/sfEvent.php
+ *     /lib/Vendor/sf/sfEventDispatcher.php
  */
 
 define('DIR_ROOT', dirname(__FILE__));
@@ -23,10 +26,12 @@ define('DIR_TMP',  DIR_ROOT.'/cache');
 define('DIR_TPL',  DIR_ROOT.'/template');
 define('DIR_YML',  DIR_ROOT.'/config');
 
-require_once(DIR_ROOT.'/library/Ah/Autoloader.ah.php');
-require_once(DIR_ROOT.'/library/Function.php');
+require_once(DIR_LIB.'/Ah/Autoloader.ah.php');
+require_once(DIR_LIB.'/Function.php');
 
 Ah_Autoloader::register(array('Ah_Autoloader', 'load'), true);
+Ah_Autoloader::register(array('Ah_Autoloader', 'sfLoad'), true);
+Ah_Autoloader::register(array('Ah_Autoloader', 'terminate'), true);
 
 /**
  * Ah_Application
@@ -41,7 +46,7 @@ abstract class Ah_Application
     public static function initialize($isDebug = false)
     {
         // #EVENT startup
-        Ah_Event_Helper::getDispatcher()->notify(null, 'app.startup');
+        Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject(null, 'app.startup'));
 
         // output buffering
         ob_start();
@@ -50,7 +55,8 @@ abstract class Ah_Application
         // set internal encoding
         mb_internal_encoding('UTF-8');
 
-        // set mb encoding directives
+        // set charset & encoding directives
+        ini_set('default_charset', 'UTF-8');
         ini_set('mbstring.script_encoding', 'UTF-8');
         ini_set('mbstring.substitute_character', '?');
         ini_set('mbstring.http_input' , 'UTF-8');
@@ -79,6 +85,27 @@ abstract class Ah_Application
             $_COOKIE  = array_walk_recursive($_COOKIE, 'stripslashes');
         }
 
+        // TODO issue: 一括でやるのではなく，Requestクラスを作ってパラメーター取得時にどうにかしたほうがいい(もしくはParamsクラス)
+        // 自動でParamsにセットされるのは，externalアクセス時のリクエストメソッドに準じるので，リクエストパラメーターを別で管理する必要がある
+        // Paramsはそれを内包しなくてはならない
+        $checkEncoding = function(&$k, &$v)
+        {
+            if ( 0
+                or !mb_check_encoding($k, 'UTF-8')
+                or !mb_check_encoding($v, 'UTF-8')
+            ) {
+                $k = null;
+                $v = null;
+            } else {
+                $k = htmlentities($k, ENT_QUOTES, 'UTF-8');
+                $v = htmlentities($v, ENT_QUOTES, 'UTF-8');
+            }
+        };
+        $_GET     = array_walk_recursive($_GET, $checkEncoding);
+        $_POST    = array_walk_recursive($_POST, $checkEncoding);
+        $_REQUEST = array_walk_recursive($_REQUEST, $checkEncoding);
+        $_COOKIE  = array_walk_recursive($_COOKIE, $checkEncoding);
+
         // initialize error report
         if ( !!ENABLE_DEBUG ) {
             error_reporting(E_ALL);
@@ -98,13 +125,13 @@ abstract class Ah_Application
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
             $stacks = debug_backtrace();
-            Ah_Event_Helper::getDispatcher()->notify(array($errno, $errstr, $errfile, $errline, $stacks), 'error.regular');
+            Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject(array($errno, $errstr, $errfile, $errline, $stacks), 'error.regular'));
         }, E_ALL);
 
         // #EVENT shutdown
         register_shutdown_function(function()
         {
-            Ah_Event_Helper::getDispatcher()->notify(null, 'app.shutdown');
+            Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject(null, 'app.shutdown'));
         });
     }
 }
