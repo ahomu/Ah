@@ -2,13 +2,27 @@
 
 abstract class Action_Abstract
 {
-    protected
-        $Params,
-        $Response;
+    // TODO issue: メソッドごとにparamsとruleを設定できないのを解決する
 
+    /**
+     * protected properties
+     *
+     * @var Ah_Param    $Params
+     * @var Ah_Response $Response
+     * @var boolean     $_allow_external
+     * @var boolean     $_allow_internal
+     * @var boolean     $_allow_includes
+     * @var array       $_receive_params
+     * @var array       $_validate_rule
+     */
     protected
-        $_receive_params,
-        $_validate_rule;
+        $Params             = null,
+        $Response           = null,
+        $_allow_external    = true,
+        $_allow_internal    = true,
+        $_allow_includes    = true,
+        $_receive_params    = array(),
+        $_validate_rule     = array();
 
     /**
      * __construct
@@ -62,6 +76,8 @@ abstract class Action_Abstract
      */
     public function output()
     {
+        if ( $this->_allow_external === false ) throw new Exception('External call not allowed');
+
         $this->Response->send();
     }
 
@@ -72,6 +88,8 @@ abstract class Action_Abstract
      */
     public function passing()
     {
+        if ( $this->_allow_internal === false ) throw new Exception('Internal call not allowed');
+
         return $this;
     }
 
@@ -82,6 +100,8 @@ abstract class Action_Abstract
      */
     public function printing()
     {
+        if ( $this->_allow_includes === false ) throw new Exception('Includes call not allowed');
+
         return $this->Response->getBody();
     }
 }

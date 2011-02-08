@@ -19,7 +19,7 @@ function array_clean($array)
  * @param array $array
  * @return boolean
  */
-function is_hash(& $array, $strict = false)
+function is_hash($array)
 {
     $i = 0;
     foreach ( $array as $k => $dummy ) {
@@ -83,7 +83,7 @@ function is_date($date, $opt)
  */
 function is_alpha($string)
 {
-    if ( function_exists('ctype_alpha') ) return ctype_alpha($string);
+    if ( function_exists('ctype_alpha') ) return ctype_alpha(strval($string));
     return (bool) preg_match('/^[a-zA-Z]+$/', $string);
 }
 
@@ -152,7 +152,7 @@ function getUnique($length, $cdStr = null)
     $cdGem = preg_split('//', $cdStr, 0, PREG_SPLIT_NO_EMPTY);
 
     $unique = null;
-    for ( $i = 0; $i < $cdLen; $i++ ) {
+    for ( $i = 0; $i < $length; $i++ ) {
         $unique .= $cdGem[array_rand($cdGem, 1)];
     }
 
@@ -167,7 +167,8 @@ function getUnique($length, $cdStr = null)
  * @param string $needle
  * @return boolean
  */
-function startsWith($haystack, $needle){
+function startsWith($haystack, $needle)
+{
     return strpos($haystack, $needle, 0) === 0;
 }
 
@@ -179,7 +180,8 @@ function startsWith($haystack, $needle){
  * @param string $needle
  * @return boolean
  */
-function endsWith($haystack, $needle){
+function endsWith($haystack, $needle)
+{
     $length = (strlen($haystack) - strlen($needle));
     if( $length <0) return false;
     return strpos($haystack, $needle, $length) !== false;
@@ -193,7 +195,8 @@ function endsWith($haystack, $needle){
  * @param string $needle
  * @return boolean
  */
-function matchesIn($haystack, $needle){
+function matchesIn($haystack, $needle)
+{
     return strpos($haystack, $needle) !== false;
 } 
 
@@ -256,92 +259,4 @@ if ( !function_exists('inputEscapingAssoc') ) {
         }
         return true;
     }
-}
-
-/**
- * d ( var_html )
- * http://zombiebook.seesaa.net/article/112484084.html
- *
- * @param mixed $obj
- * @param boolean $get
- * @return output|string
- */
-function d($obj, $get = false){
-  $space = ' ';
-  $indent = '　';
-  $return = "<br />";
-  ob_start();
-  var_dump($obj);
-  $data = ob_get_clean();
-  $data = trim($data);
-  // string データ部を html エンティティに変換
-  $pos = -1;
-  while(($pos = strpos($data, 'string', $pos + 1)) !== false){
-    // string の前方
-    $tx1 = substr($data, 0, $pos);
-    // string 以降
-    $txx = substr($data, $pos);
-    // string 以降から細部切出
-    preg_match("/^(string\((\d+)\)\s\")([^\x1b]*)/", $txx, $mts);
-    // string データ長
-    $len = $mts[2];
-    // string からデータ直前まで
-    $tx2 = "string($len) " . '"';
-    // string データ部
-    $tx3 = substr($mts[3], 0, $mts[2]);
-    // string データの後方
-    $tx4 = substr($mts[3], $mts[2]);
-    // データ部の変換
-    $txm = str_replace(
-      array("\n", ' '),
-      array("\\n", ' '),
-      htmlentities(
-        $tx3,
-        ENT_QUOTES,
-        mb_internal_encoding()
-      )
-    );
-    $data = $tx1 . $tx2 . $txm . $tx4;
-    // string 検索開始位置更新
-    $pos = $pos + (strlen(bin2hex($tx2 . $txm)) / 2);
-  }
-  // 以下可視性アップ
-  // string データ部 \n を変換しないと string に騙される
-  // 循環参照部分のチェック
-  $data = preg_replace(
-    "/(\n\s+)(\*RECURSION\*)(\n)/",
-    '${1}<b style="color:red;">${2}</b>${3}',
-    $data
-  );
-  // 参照渡し部分とオブジェクトの可視性を上げる
-  $data = preg_replace(
-    "/(&?)(array)(\(\d+\)\s\{\n)/",
-    '<b style="color:purple;">${1}</b><b>${2}</b>${3}',
-    $data
-  );
-  $data = preg_replace(
-    "/(&?)(object\([^\n\s]+\))(#\d*\s\(\d+\)\s\{\n)/",
-    '<b style="color:purple;">${1}</b><b>${2}</b>${3}',
-    $data
-  );
-  // キーの可視性を上げる
-  $data = preg_replace(
-    "/(\s\[\"([^\n]+)\"\]=>\n)+?/",
-    ' ["<b style="color:blue;">${2}</b>"]=>' . "\n",
-    $data
-  );
-  $data = preg_replace(
-    "/(\s\[(\d+)\]=>\n)+?/",
-    ' [<b style="color:blue;">${2}</b>]=>' . "\n",
-    $data
-  );
-  // <br />とインデントを追加
-  $data = str_replace("\n", $return . "\n" . $indent, $data);
-  // ２連の空白を $space に置換
-  $data = str_replace(" ", $space, $data);
-  if($get){
-    return $indent . $data . $return . "\n";
-  }else{
-    echo $indent . $data . $return . "\n";
-  }
 }
