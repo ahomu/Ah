@@ -84,10 +84,9 @@ class Ah_Request
      * getParams
      *
      * @param string $type ( GET, POST, COOKIE )
-     * @param string $charset
      * @return bool
      */
-    public static function getParams($type, $charset = null)
+    public static function getParams($type)
     {
         switch ( $type ) {
             case 'GET'  :
@@ -104,9 +103,6 @@ class Ah_Request
                 break;
         }
 
-        // TODO exception: when invalid encoding parameter found out
-        $charset = $charset !== null ? $charset : mb_internal_encoding();
-        array_walk_recursive($params, 'checkEncoding', $charset);
         return $params;
     }
 }

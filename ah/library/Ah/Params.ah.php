@@ -13,7 +13,8 @@ class Ah_Params
     private
         $_allows,
         $_params,
-        $_meta;
+        $_meta,
+        $_charset;
 
     /**
      * __construct
@@ -22,14 +23,16 @@ class Ah_Params
      * @param array $params
      * @return void
      */
-    public function __construct($allows, $params)
+    public function __construct($allows, $params, $charset = null)
     {
-        // TODO exception: $params isHash?
-        // TODO exception: $allows, $params are empty?
+        $this->_charset = $charset !== null ? $charset : mb_internal_encoding();
+
         if ( !is_array($allows) ) $allows = array();
         if ( !is_array($params) ) $params = array();
 
-        // undefined param's value = null
+        array_walk_recursive($params, 'checkEncoding', $this->_charset);
+
+        // 未定義のパラメーターには，nullをセットする
         $this->_allows = $allows;
         $this->_params = array();
         foreach ( $this->_allows as $key ) {
@@ -73,12 +76,10 @@ class Ah_Params
         if ( $raw === true ) return $val;
 
         // safety value
-        $charset = mb_internal_encoding();
-
         if ( is_array($val) ) {
-            $val = array_walk_recursive($val, 'escapeParameter', $charset);
+            $val = array_walk_recursive($val, 'escapeParameter', $this->_charset);
         } else {
-            $val = escapeParameter($key, $val, $charset);
+            $val = escapeParameter($key, $val, $this->_charset);
         }
 
         return $val;
