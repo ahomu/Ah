@@ -11,16 +11,6 @@
 // TODO issue: ユーザー拡張のエンドポイントを考える
 class Ah_Validator
 {
-    private static $INSTANCE;
-
-    public static function singleton()
-    {
-        if ( self::$INSTANCE === null ) {
-            self::$INSTANCE = new self();;
-        }
-        return self::$INSTANCE;
-    }
-
     private $_temporary;
 
     /**

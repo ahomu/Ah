@@ -43,7 +43,7 @@ abstract class Action_Abstract
     public function params($params)
     {
         $this->Params = new Ah_Params($this->_receive_params, $params);
-        $this->Params->validate($this->_validate_rule, Ah_Validator::singleton());
+        $this->Params->validate($this->_validate_rule, new Ah_Validator());
     }
 
     /**
