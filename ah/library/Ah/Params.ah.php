@@ -38,16 +38,16 @@ class Ah_Params
     }
 
     /**
-     * __set
+     * set
      *
      * @param string $key
-     * @param mixed $value
-     * @return boolean
+     * @param mixed $val
+     * @return bool
      */
-    public function __set($key, $value)
+    public function set($key, $val)
     {
         if ( in_array($key, $this->_allows) ) {
-            $this->_params[$key] = $value;
+            $this->_params[$key] = $val;
             return true;
         } else {
             return false;
@@ -55,18 +55,33 @@ class Ah_Params
     }
 
     /**
-     * __get
+     * get
      *
      * @param string $key
+     * @param bool $raw
      * @return mixed
      */
-    public function __get($key)
+    public function get($key, $raw = false)
     {
-        if ( in_array($key, $this->_allows) ) {
-            return $this->_params[$key];
+        // undefined
+        if ( !in_array($key, $this->_allows) ) return false;
+
+        // temporary
+        $val = $this->_params[$key];
+
+        // raw value
+        if ( $raw === true ) return $val;
+
+        // safety value
+        $charset = mb_internal_encoding();
+
+        if ( is_array($val) ) {
+            $val = array_walk_recursive($val, 'escapeParameter', $charset);
         } else {
-            return false;
+            $val = escapeParameter($key, $val, $charset);
         }
+
+        return $val;
     }
 
     /**

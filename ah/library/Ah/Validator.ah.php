@@ -11,7 +11,8 @@
 // TODO issue: ユーザー拡張のエンドポイントを考える
 class Ah_Validator
 {
-    private $_temporary;
+    private
+        $_temporary;
 
     /**
      * validate

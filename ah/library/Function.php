@@ -201,6 +201,34 @@ function matchesIn($haystack, $needle)
 } 
 
 /**
+ * checkEncoding ( with array_walk_recursive )
+ *
+ * @param mixed $key
+ * @param mixed $val
+ * @param string $charset
+ * @return void
+ */
+function checkEncoding(&$key, &$val, $charset = 'UTF-8')
+{
+    $key = mb_check_encoding($key, $charset) ? $key : 'invalid encoding';
+    $val = mb_check_encoding($val, $charset) ? $val : 'invalid encoding';
+}
+
+/**
+ * escapeParameter ( with array_walk_recursive )
+ *
+ * @param mixed $key
+ * @param mixed $val
+ * @param string $charset
+ * @return void
+ */
+function escapeParameter(&$key, &$val, $charset = 'UTF-8')
+{
+    $key = htmlentities($key, ENT_QUOTES, $charset);
+    $val = htmlentities($val, ENT_QUOTES, $charset);
+}
+
+/**
  * @overwrite json decode & encode functions.
  */
 if ( !function_exists('json_decode') ) {
@@ -222,41 +250,3 @@ if ( !function_exists('json_encode') ) {
     }
 }
 
-/**
- * fixEncodingAssoc
- *
- * @param mixed $val
- * @return void
- */
-if ( !function_exists('fixEncodingAssoc') ) {
-    function fixEncodingAssoc(& $val)
-    {
-        if ( is_array($val) ) {
-            array_walk($val, 'fixEncodingAssoc');
-        } else {
-            if ( get_magic_quotes_gpc() ) $val = stripslashes($val);
-            if ( !!($enc = mb_detect_encoding($val, 'UTF-8, EUC-JP, SJIS-win')) ) {
-                $val    = mb_convert_encoding($val, 'UTF-8', $enc);
-            }
-        }
-        return true;
-    }
-}
-
-/**
- * inputEscapingAssoc
- *
- * @param mixed $val
- * @return void
- */
-if ( !function_exists('inputEscapingAssoc') ) {
-    function inputEscapingAssoc(& $val)
-    {
-        if ( is_array($val) ) {
-            array_walk($val, 'inputEscapingAssoc');
-        } else {
-            $val    = htmlentities($val, ENT_QUOTES, 'UTF-8');
-        }
-        return true;
-    }
-}

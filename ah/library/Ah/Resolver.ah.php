@@ -26,10 +26,8 @@ class Ah_Resolver
         if ( empty($params) ) {
             switch ( $method ) {
                 case 'POST' :
-                    $params = $_POST;
-                    break;
                 case 'GET'  :
-                    $params = $_GET;
+                    $params = Ah_Request::getParams($method);
                     break;
                 case 'PUT'  :
                     $params = array(file_get_contents('php://input'));

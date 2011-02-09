@@ -20,7 +20,6 @@
  */
 
 define('DIR_ROOT', dirname(__FILE__));
-define('DIR_ACT',  DIR_ROOT.'/action');
 define('DIR_LIB',  DIR_ROOT.'/library');
 define('DIR_TMP',  DIR_ROOT.'/cache');
 define('DIR_TPL',  DIR_ROOT.'/template');
@@ -30,10 +29,8 @@ require_once(DIR_LIB.'/Ah/Autoloader.ah.php');
 require_once(DIR_LIB.'/Function.php');
 
 $Loader = new Ah_Autoloader();
-
 $Loader->register(array($Loader, 'ahLoad'), true);
 $Loader->register(array($Loader, 'sfLoad'), true);
-$Loader->register(array($Loader, 'userLoad'), true);
 $Loader->register(array($Loader, 'terminate'), true);
 
 /**
@@ -46,6 +43,12 @@ $Loader->register(array($Loader, 'terminate'), true);
  */
 abstract class Ah_Application
 {
+    /**
+     * initialize
+     *
+     * @param bool $isDebug
+     * @return void
+     */
     public static function initialize($isDebug = false)
     {
         // #EVENT startup
@@ -68,49 +71,8 @@ abstract class Ah_Application
         // anti "&amp;" for http_bulid_query()
         ini_set('arg_separator.output', '&');
 
-        // define constants
-        define('REQUEST_HOST', !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
-        define('REQUEST_URI', $_SERVER['REQUEST_URI']);
-        define('REQUEST_METHOD', $_SERVER['REQUEST_METHOD']);
-
-        define('IP_CLIENT', $_SERVER['REMOTE_ADDR']);
-        define('IP_SERVER', $_SERVER['SERVER_ADDR']);
-
-        define('ENABLE_DEBUG', $isDebug);
-        define('ENABLE_GZIP', !!( isset($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false));
-        define('ENABLE_SSL',  !!( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'));
-
-        // anti "magic_quotes_gpc" directive [@ref http://pentan.info/php/magic_quotes_on.html]
-        if ( get_magic_quotes_gpc() ) {
-            $_GET     = array_walk_recursive($_GET, 'stripslashes');
-            $_POST    = array_walk_recursive($_POST, 'stripslashes');
-            $_REQUEST = array_walk_recursive($_REQUEST, 'stripslashes');
-            $_COOKIE  = array_walk_recursive($_COOKIE, 'stripslashes');
-        }
-
-        // TODO issue: 一括でやるのではなく，Requestクラスを作ってパラメーター取得時にどうにかしたほうがいい(もしくはParamsクラス)
-        // 自動でParamsにセットされるのは，externalアクセス時のリクエストメソッドに準じるので，リクエストパラメーターを別で管理する必要がある
-        // Paramsはそれを内包しなくてはならない
-        $checkEncoding = function(&$k, &$v)
-        {
-            if ( 0
-                or !mb_check_encoding($k, 'UTF-8')
-                or !mb_check_encoding($v, 'UTF-8')
-            ) {
-                $k = null;
-                $v = null;
-            } else {
-                $k = htmlentities($k, ENT_QUOTES, 'UTF-8');
-                $v = htmlentities($v, ENT_QUOTES, 'UTF-8');
-            }
-        };
-        $_GET     = array_walk_recursive($_GET, $checkEncoding);
-        $_POST    = array_walk_recursive($_POST, $checkEncoding);
-        $_REQUEST = array_walk_recursive($_REQUEST, $checkEncoding);
-        $_COOKIE  = array_walk_recursive($_COOKIE, $checkEncoding);
-
         // initialize error report
-        if ( !!ENABLE_DEBUG ) {
+        if ( !!$isDebug ) {
             error_reporting(E_ALL);
             ini_set('display_errors', 1);
             ini_set('log_errors', 1);
