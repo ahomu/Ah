@@ -1,16 +1,16 @@
 <?php
 
 /**
- * MIME
+ * Util_MIME
  *
- * @package     MIME
+ * @package     Util
  * @copyright   2010 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class MIME
+class Util_MIME
 {
-    protected static $singleton;
+    protected static $INSTANCE;
 
     /**
      * detectMimeType
@@ -20,11 +20,11 @@ class MIME
      */
     public static function detectType($extention)
     {
-        if ( !isset(MIME::$singleton) ) {
-            MIME::$singleton = new MIME();
+        if ( !isset(Util_MIME::$INSTANCE) ) {
+            Util_MIME::$INSTANCE = new Util_MIME();
         }
-        // exception memo: extention is not found
-        return MIME::$singleton->$extention;
+        // TODO exception: extention is not found
+        return Util_MIME::$INSTANCE->$extention;
     }
 
     private

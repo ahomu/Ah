@@ -43,9 +43,9 @@ class Ah_Resolver
     /**
      * internal - internal action and get executed action instance
      *
-     * @param string $path
-     * @param string $method
-     * @param array $params
+     * @param  string $path
+     * @param  string $method
+     * @param  array $params
      * @return object $Action
      */
     public static function internal($path, $method, $params = array())
@@ -60,9 +60,9 @@ class Ah_Resolver
     /**
      * includes - internal action and get response body
      *
-     * @param string $path
-     * @param string $method
-     * @param array $params
+     * @param  string $path
+     * @param  string $method
+     * @param  array $params
      * @return string $responseBody
      */
     public static function includes($path, $method, $params = array())
@@ -75,11 +75,11 @@ class Ah_Resolver
     }
 
     /**
-     * redirect - go external uri
+     * redirect - goto uri
      *
-     * @param string $path
-     * @param array $params get query params
-     * @retur ( send http response )n void
+     * @param  string $path path or url
+     * @param  array $params GET only
+     * @return void
      */
     public static function redirect($path, $params = array())
     {
@@ -207,6 +207,7 @@ class Ah_Resolver
         if ( empty($map[$method]) ) return array();
 
         foreach ( $map[$method] as $path => $args ) {
+            // 前方一致によって判定を行う
             if ( strpos($rawPath, $path) === 0 ) {
                 $chunks = explode('/', substr($rawPath, strlen($path)));
 
@@ -224,7 +225,10 @@ class Ah_Resolver
 
                 if ( empty($args) || empty($chunks) ) return array();
 
+                // 元のパスを書き換える
                 $rawPath = $path;
+
+                // 切り出したパラメーターを返す
                 return array_combine($args, $chunks);
             }
         }

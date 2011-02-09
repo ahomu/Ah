@@ -29,9 +29,12 @@ define('DIR_YML',  DIR_ROOT.'/config');
 require_once(DIR_LIB.'/Ah/Autoloader.ah.php');
 require_once(DIR_LIB.'/Function.php');
 
-Ah_Autoloader::register(array('Ah_Autoloader', 'load'), true);
-Ah_Autoloader::register(array('Ah_Autoloader', 'sfLoad'), true);
-Ah_Autoloader::register(array('Ah_Autoloader', 'terminate'), true);
+$Loader = new Ah_Autoloader();
+
+$Loader->register(array($Loader, 'ahLoad'), true);
+$Loader->register(array($Loader, 'sfLoad'), true);
+$Loader->register(array($Loader, 'userLoad'), true);
+$Loader->register(array($Loader, 'terminate'), true);
 
 /**
  * Ah_Application
@@ -125,6 +128,7 @@ abstract class Ah_Application
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
             $stacks = debug_backtrace();
+            $stacks = array_splice($stacks, 1);
             Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject(array($errno, $errstr, $errfile, $errline, $stacks), 'error.regular'));
         }, E_ALL);
 

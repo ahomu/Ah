@@ -8,69 +8,165 @@
  * @license     MIT License
  * @author      Ayumu Sato
  */
-// TODO issue: ユーザー拡張のエンドポイントを考える
 class Ah_Autoloader
 {
-    static public $path = array();
-
     /**
      * register
      *
      * @return void
      */
-    public static function register($func, $throw = false)
+    public function register($func, $throw = false)
     {
         spl_autoload_register($func, $throw);
     }
 
     /**
-     * load
+     * ahLoad
      *
-     * @param  string $className
      * @return void
      */
-    public static function load($className)
+    public function ahLoad($className)
     {
-        $prefix = substr($className, 0, strpos($className, '_'));
+        $prefix = $this->_getUnscoPrefix($className);
 
-        if ( in_array($prefix, array('Model', 'View', 'Ah')) )
-        {
-            $pathStack  = array(DIR_LIB);
-            $compType   = '.'.strtolower($prefix); // .model | .view | .ah
-        }
-        elseif ( $prefix === 'Action' )
-        {
-            $pathStack  = array(DIR_ACT);
-            $compType   = '.action';
-            $className  = substr($className, strlen('Action_'));
-        }
-        else
-        {
-            $pathStack  = array(DIR_LIB.'/Class');
-            $compType   = '';
-        }
-
-        $chunks     = explode('_', $className);
-        foreach ( $chunks as $chunk ) {
-            $pathStack[] = $chunk;
+        switch ($prefix) {
+            case 'Ah'       :
+                $this->ahCoreLoad($className);
+                break;
+            case 'Action'   :
+                $this->ahActionLoad($className);
+                break;
+            case 'Model'    :
+                $this->ahModelLoad($className);
+                break;
+            case 'View'     :
+                $this->ahViewLoad($className);
+                break;
+            default         :
+                $this->ahCommonLoad($className);
+                break;
         }
 
-        $classPath  = implode('/', $pathStack)."$compType.php";
-        if ( is_readable($classPath) ) {
-            require_once($classPath);
-        }
+    }
+
+    /**
+     * ahCoreLoad
+     *
+     * @param string $className
+     * @return void
+     */
+    public function ahCoreLoad($className)
+    {
+        $this->_traversal($className, '.ah');
+    }
+
+    /**
+     * ahActionLoad
+     *
+     * @param string $className
+     * @return void
+     */
+    public function ahActionLoad($className)
+    {
+        $this->_traversal($className, '.action');
+    }
+
+    /**
+     * ahModelLoad
+     *
+     * @param string $className
+     * @return void
+     */
+    public function ahModelLoad($className)
+    {
+        $this->_traversal($className, '.model');
+    }
+
+    /**
+     * ahViewLoad
+     *
+     * @param string $className
+     * @return void
+     */
+    public function ahViewLoad($className)
+    {
+        $this->_traversal($className, '.view');
+    }
+
+    /**
+     * ahCommonLoad
+     *
+     * @param string $className
+     * @return void
+     */
+    public function ahCommonLoad($className)
+    {
+        $this->_traversal($className, null, 'Common');
     }
 
     /**
      * sfLoad
      *
-     * @param  $className
+     * @param string $className
      * @return void
      */
-    public static function sfLoad($className)
+    public function sfLoad($className)
     {
         $classPath = DIR_LIB.'/Vendor/sf/'.$className.'.php';
+        $this->_load($classPath);
+    }
 
+    /**
+     * userLoad
+     *
+     * @param string $className
+     * @return void
+     */
+    public function userLoad($className)
+    {
+        // TODO issue: ユーザー拡張について考える
+        return false;
+    }
+
+    /**
+     * _getUnscoPrefix
+     *
+     * @param string $className
+     * @return string
+     */
+    private function _getUnscoPrefix($className)
+    {
+        return substr($className, 0, strpos($className, '_'));
+    }
+
+    /**
+     * _traversal
+     * @param string $className
+     * @param string $extension
+     * @param string $prefix
+     */
+    private function _traversal($className, $extension = '', $prefix = '')
+    {
+        $pathStack = array(DIR_LIB);
+        if ( $prefix !== '' ) $pathStack[] = $prefix;
+
+        $chunks     = explode('_', $className);
+        foreach ( $chunks as $chunk ) {
+            $pathStack[] = $chunk;
+        }
+        $classPath  = implode('/', $pathStack)."$extension.php";
+
+        $this->_load($classPath);
+    }
+
+    /**
+     * _load
+     *
+     * @param string $classPath
+     * @return void
+     */
+    private function _load($classPath)
+    {
         if ( is_readable($classPath) ) {
             require_once($classPath);
         }
@@ -80,10 +176,10 @@ class Ah_Autoloader
      * terminate
      *
      * @throws Ah_Exception_NotFound
-     * @param  $className
+     * @param string $className
      * @return void
      */
-    public static function terminate($className)
+    public function terminate($className)
     {
         throw new Ah_Exception_NotFound($className);
     }
