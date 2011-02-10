@@ -46,7 +46,7 @@ abstract class Ah_Application
     /**
      * initialize
      *
-     * @param bool $isDebug
+     * @param bool|callable $isDebug
      * @return void
      */
     public static function initialize($isDebug = false)
@@ -67,12 +67,12 @@ abstract class Ah_Application
         ini_set('mbstring.substitute_character', '?');
         ini_set('mbstring.http_input' , 'UTF-8');
         ini_set('mbstring.http_output' , 'pass');
-
-        // anti "&amp;" for http_bulid_query()
         ini_set('arg_separator.output', '&');
 
         // initialize error report
-        if ( !!$isDebug ) {
+        if ( is_callable($isDebug) ) {
+            $isDebug();
+        } else if ( !!$isDebug ) {
             error_reporting(E_ALL);
             ini_set('display_errors', 1);
             ini_set('log_errors', 1);
