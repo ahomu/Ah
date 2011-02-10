@@ -12,14 +12,15 @@
 class Ah_Validator
 {
     private
-        $_temporary;
+        $_temporary,
+        $_result;
 
     /**
      * validate
      *
      * @param array $validate_rule
      * @param array $params
-     * @return array $result
+     * @return Ah_Validator $this
      */
     public function validate($rule, $params)
     {
@@ -42,7 +43,44 @@ class Ah_Validator
                 $result[$param][$method] = $this->fire($method, $val, $args);
             }
         }
-        return $result;
+
+        $this->_result = $result;
+        return $this;
+    }
+
+    /**
+     * isValid
+     *
+     * @param string $params key
+     * @return boolean
+     */
+    public function isValid($key)
+    {
+        // TODO exception: validation not yet
+        if ( empty($this->_result[$key]) ) return true;
+
+        if ( in_array(false, $this->_result[$key]) ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * isValidAll
+     *
+     * @return boolean
+     */
+    public function isValidAll()
+    {
+        // TODO exception: validation not yet
+        if ( empty($this->_result) ) return true;
+
+        foreach ( $this->_result as $row ) {
+            if ( in_array(false, $row) ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -97,13 +135,13 @@ class Ah_Validator
     protected function equalTo($val, $args)
     {
         // needle?
-        if ( empty($args[0]) || empty($this->_teporary[$args[0]]) ) return false;
+        if ( empty($args[0]) || empty($this->_temporary[$args[0]]) ) return false;
 
         // strict?
         if ( !empty($args[1]) && $args[1] === true ) {
-            return ($val === $this->_teporary[$args[0]]);
+            return ($val === $this->_temporary[$args[0]]);
         } else {
-            return ($val == $this->_teporary[$args[0]]);
+            return ($val == $this->_temporary[$args[0]]);
         }
     }
 
@@ -197,4 +235,5 @@ class Ah_Validator
         $opt = ($args[0]) ? $args[0] : 'iso';
         return is_date($val, $opt);
     }
+
 }

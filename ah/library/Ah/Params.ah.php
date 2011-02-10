@@ -13,7 +13,7 @@ class Ah_Params
     private
         $_allows,
         $_params,
-        $_meta,
+        $_validator,
         $_charset;
 
     /**
@@ -25,11 +25,11 @@ class Ah_Params
      */
     public function __construct($allows, $params, $charset = null)
     {
-        $this->_charset = $charset !== null ? $charset : mb_internal_encoding();
-
         if ( !is_array($allows) ) $allows = array();
         if ( !is_array($params) ) $params = array();
 
+        // 初期化時に，文字コードをチェックする
+        $this->_charset = $charset !== null ? $charset : mb_internal_encoding();
         array_walk_recursive($params, 'checkEncoding', $this->_charset);
 
         // 未定義のパラメーターには，nullをセットする
@@ -89,12 +89,12 @@ class Ah_Params
      * validate
      *
      * @param array $validate_condition_hash
-     * @param object $Validator
+     * @param Ah_Validator $Validator
      * @return void
      */
     public function validate($rule, Ah_Validator $Validator)
     {
-        $this->_meta['validate'] = $Validator->validate($rule, $this->_params);
+        $this->_validator = $Validator->validate($rule, $this->_params);
     }
 
     /**
@@ -104,15 +104,7 @@ class Ah_Params
      */
     public function isValidAll()
     {
-        // TODO exception: validation not yet
-        if ( empty($this->_meta['validate']) ) return true;
-
-        foreach ( $this->_meta['validate'] as $row ) {
-            if ( in_array(false, $row) ) {
-                return false;
-            }
-        }
-        return true;
+        return $this->_validator->isValidAll();
     }
 
     /**
@@ -123,12 +115,7 @@ class Ah_Params
      */
     public function isValid($key)
     {
-        if ( empty($this->_meta['validate'][$key]) ) return true;
-
-        if ( in_array(false, $this->_meta['validate'][$key]) ) {
-            return false;
-        }
-        return true;
+        return $this->_validator->isValid($key);
     }
 
     /**

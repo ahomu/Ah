@@ -14,6 +14,7 @@ abstract class Action_Abstract
      * @var boolean     $_allow_includes
      * @var array       $_receive_params
      * @var array       $_validate_rule
+     * @var string      $_default_charset
      */
     protected
         $Params             = null,
@@ -22,7 +23,8 @@ abstract class Action_Abstract
         $_allow_internal    = true,
         $_allow_includes    = true,
         $_receive_params    = array(),
-        $_validate_rule     = array();
+        $_validate_rule     = array(),
+        $_default_charset   = null;
 
     /**
      * __construct
@@ -42,7 +44,12 @@ abstract class Action_Abstract
      */
     public function params($params)
     {
-        $this->Params = new Ah_Params($this->_receive_params, $params);
+        $this->Params = new Ah_Params($this->_receive_params, $params, $this->_default_charset);
+
+        /**
+         * 自動validate
+         * 手動の時は，$this->Params->validate($myRules, new Ah_Validator()) としてActionのメインロジック内で実行する
+         */
         $this->Params->validate($this->_validate_rule, new Ah_Validator());
     }
 
