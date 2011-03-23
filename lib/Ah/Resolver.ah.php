@@ -85,7 +85,9 @@ class Ah_Resolver
             $path .= '?'.http_build_query($params);
         }
         if ( !preg_match('/^https?:\/\//', $path) ) {
-            $path = (ENABLE_SSL ? 'https://' : 'http://').REQUEST_HOST.$path;
+            $host = Ah_Request::getHost();
+            $ssl  = Ah_Request::isSsl();
+            $path = ($ssl ? 'https://' : 'http://').$host.$path;
         }
 
         $Res = new Ah_Response();
