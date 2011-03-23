@@ -19,12 +19,6 @@
  *     /lib/Vendor/sf/sfEventDispatcher.php
  */
 
-define('DIR_ROOT', dirname(__FILE__));
-define('DIR_LIB',  DIR_ROOT.'/library');
-define('DIR_TMP',  DIR_ROOT.'/cache');
-define('DIR_TPL',  DIR_ROOT.'/template');
-define('DIR_YML',  DIR_ROOT.'/config');
-
 require_once(DIR_LIB.'/Ah/Autoloader.ah.php');
 require_once(DIR_LIB.'/Function.php');
 

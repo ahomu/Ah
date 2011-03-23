@@ -185,7 +185,7 @@ class Ah_Resolver
 
         $Action = new $actionName();
 
-        if ( !$Action instanceof Action_Interface ) {
+        if ( !$Action instanceof Ah_Action_Interface ) {
             throw new Exception('Calling '.$actionName.' class does not implement Action_Interface.');
         }
 
@@ -201,6 +201,8 @@ class Ah_Resolver
      */
     private static function _argumentsMapper(& $rawPath, $method)
     {
+        // TODO issue: yamlファイル定義以外のマッピングを考える
+
         $map = Ah_Config::load('map', 'arguments_mapper');
         if ( empty($map[$method]) ) return array();
 
@@ -212,7 +214,7 @@ class Ah_Resolver
                 // remove blank
                 $chunks = array_clean($chunks);
 
-                // adjust samller length
+                // adjust smaller length
                 $count  = min(array(count($args), count($chunks)));
 
                 // key

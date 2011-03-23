@@ -284,8 +284,11 @@ class HTTP_Client
      */
     private function _buildRequest()
     {
-        $eol    = $this->eol;
-        $header = array_merge(array_diff($this->_header, array('')));
+        $eol     = $this->eol;
+        $header  = array_merge(array_diff($this->_header, array('')));
+        $request = '';
+
+        // TODO issue: ヘッダから改行コードを除去する
 
         // Host
         $header['Host']  = "{$this->host}";

@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__).'/sfEvent.php';
+require_once dirname(__FILE__) . '/sfEvent.php';
 
 /*
  * This file is part of the symfony package.

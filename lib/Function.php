@@ -125,6 +125,20 @@ function in_range($i, $min, $max)
 }
 
 /**
+ * is_serialized
+ * http://www.weberdev.com/get_example-4099.html
+ *
+ * @param string $val
+ * @return bool
+ */
+function is_serialized($val){
+    if ( !is_string($val) ) { return false; }
+    if ( trim($val) == "" ) { return false; }
+    if ( preg_match("/^(i|s|a|o|d):(.*);/si",$val) !== false ) { return true; }
+    return false;
+}
+
+/**
  * bytelen
  * http://zombiebook.seesaa.net/article/33192046.html
  *

@@ -36,9 +36,7 @@ class Ah_Autoloader
             case 'Action'   :
                 $this->ahActionLoad($className);
                 break;
-            case 'Model'    :
-                $this->ahModelLoad($className);
-                break;
+            // TODO issue: 'View' will rename to 'Surface'
             case 'View'     :
                 $this->ahViewLoad($className);
                 break;
@@ -50,17 +48,6 @@ class Ah_Autoloader
     }
 
     /**
-     * ahCoreLoad
-     *
-     * @param string $className
-     * @return void
-     */
-    public function ahCoreLoad($className)
-    {
-        $this->_traversal($className, '.ah');
-    }
-
-    /**
      * ahActionLoad
      *
      * @param string $className
@@ -68,18 +55,18 @@ class Ah_Autoloader
      */
     public function ahActionLoad($className)
     {
-        $this->_traversal($className, '.action');
+        $this->_traversal(DIR_ACT, $className, 'action');
     }
 
     /**
-     * ahModelLoad
+     * ahCoreLoad
      *
      * @param string $className
      * @return void
      */
-    public function ahModelLoad($className)
+    public function ahCoreLoad($className)
     {
-        $this->_traversal($className, '.model');
+        $this->_traversal(DIR_LIB.'/Ah', $className, 'ah');
     }
 
     /**
@@ -90,7 +77,7 @@ class Ah_Autoloader
      */
     public function ahViewLoad($className)
     {
-        $this->_traversal($className, '.view');
+        $this->_traversal(DIR_LIB.'/View', $className, 'view');
     }
 
     /**
@@ -101,7 +88,7 @@ class Ah_Autoloader
      */
     public function ahCommonLoad($className)
     {
-        $this->_traversal($className, null, 'Common');
+        $this->_traversal(DIR_LIB.'/Common', $className, null);
     }
 
     /**
@@ -117,18 +104,6 @@ class Ah_Autoloader
     }
 
     /**
-     * userLoad
-     *
-     * @param string $className
-     * @return void
-     */
-    public function userLoad($className)
-    {
-        // TODO issue: ユーザー拡張について考える
-        return false;
-    }
-
-    /**
      * _getUnscoPrefix
      *
      * @param string $className
@@ -141,19 +116,27 @@ class Ah_Autoloader
 
     /**
      * _traversal
+     *
      * @param string $className
      * @param string $extension
      * @param string $prefix
      */
-    private function _traversal($className, $extension = '', $prefix = '')
+    private function _traversal($basepath, $className, $prefix = null)
     {
-        $pathStack = array(DIR_LIB);
-        if ( $prefix !== '' ) $pathStack[] = $prefix;
+        if ( $prefix !== null ) {
+            $extension = '.'.strtolower($prefix);
+            $className = substr($className, strlen($prefix.'_'));
+        } else {
+            $extension = '';
+        }
 
         $chunks     = explode('_', $className);
+        $pathStack = array($basepath);
+
         foreach ( $chunks as $chunk ) {
             $pathStack[] = $chunk;
         }
+
         $classPath  = implode('/', $pathStack)."$extension.php";
 
         $this->_load($classPath);

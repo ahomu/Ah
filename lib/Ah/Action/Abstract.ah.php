@@ -1,6 +1,6 @@
 <?php
 
-abstract class Action_Abstract
+abstract class Ah_Action_Abstract
 {
     // TODO issue: メソッドごとにparamsとruleを設定できないのを解決する
 

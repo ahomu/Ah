@@ -24,21 +24,21 @@ AhはPHPのWebAPIフレームワークです．作っている最中です．
 
 ##Actionの起動ルールと，ファイルの既定位置
 
-クラス名はリクエストと対応します．/fooのリクエストで呼び出されるActionは，Action_Fooとなります．この場合のクラスファイルは，actディレクトリ内に，/act/Foo.action.phpとして配置します．クラス名の部分は常にアッパーケースであることに注意して下さい．
+クラス名はリクエストと対応します．/fooのリクエストで呼び出されるActionは，Action_Fooとなります．この場合のクラスファイルは，actionディレクトリ(/app/action)内に，/action/Foo.action.phpとして配置します．クラス名の部分は常にアッパーケースであることに注意して下さい．
 
 指定されたリクエストメソッドによって，Action内で実行されるメソッドが異なります．GETリクエストであればgetメソッドが，POSTリクエストであればpostメソッドがメインプロセスとして実行されます．
 
 GET /
     Action_Index::get()
-    /ah/library/Action/Index.action.php
+    /app/action/Index.action.php
 
 GET /foo
     Action_Foo::get()
-    /ah/library/Action/Foo.action.php
+    /app/action/Foo.action.php
 
 POST /foo/bar
     Action_Foo_Bar::post()
-    /ah/library/Action/Hoge/Fuga.action.php
+    /app/action/Hoge/Fuga.action.php
 
 
 
@@ -86,7 +86,7 @@ Ah_Resolverクラスはexternalとinternalとredirectというスタティック
 
     <?php
 
-    class Action_Index extends Action_Abstract implements Action_Interface
+    class Action_Index extends Ah_Action_Abstract implements Ah_Action_Interface
     {
         protected
             // 引数として受け取れるパラメーターの定義
@@ -139,7 +139,7 @@ Ah_Resolverクラスはexternalとinternalとredirectというスタティック
 
 リクエストパスに対するパラメーターマッピングも可能です．http://example.com/entry/123/ のようなリクエストに対して，Entryアクションを起動し，123をアクションに対するパラメーターとして与えることが可能です．
 
-マッピングは現在，/ah/config/config.map.yaml で定義します．マッピングによって決定されたパラメーターがある場合，Actionにスーパーグローバルなパラメーターはセットされません．
+マッピングは現在，/app/config/config.map.yaml で定義します．マッピングによって決定されたパラメーターがある場合，Actionにスーパーグローバルなパラメーターはセットされません．
 
 ###サンプル ( yml )
 

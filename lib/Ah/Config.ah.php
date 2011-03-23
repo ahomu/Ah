@@ -22,7 +22,7 @@ class Ah_Config
     public static function load($key, $needle = null)
     {
         if ( !array_key_exists($key, self::$RAM) ) {
-            $ymlPath    = DIR_YML."/config.$key.yml";
+            $ymlPath    = DIR_YML."/$key.yml";
 
             if ( Ah_Cache::isValid($ymlPath, 'config') ) {
                 self::$RAM[$key] = unserialize(Ah_Cache::load($ymlPath, 'config'));

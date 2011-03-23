@@ -1,6 +1,6 @@
 <?php
 
-interface Action_Interface
+interface Ah_Action_Interface
 {
     /**
      * params
