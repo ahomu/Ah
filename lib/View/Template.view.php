@@ -36,8 +36,8 @@ class View_Template extends View_Abstract
             $tpl = file_get_contents($tplPath);
             $this->tpl = new Template($tpl);
         } else {
-            // throw exception template file is not found
-            $this->tpl = null;
+            // TODO exception: template file is not found
+            $this->tpl = new Template('');
         }
     }
 

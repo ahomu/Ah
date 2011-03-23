@@ -140,7 +140,8 @@ class Ah_Response
     private function _sendHeader()
     {
         foreach ( $this->_headers as $key => $val ) {
-            header($key.': '.$val);
+            $header = $key.': '.$val;
+            header($header);
         }
     }
 
@@ -167,7 +168,7 @@ class Ah_Response
                        self::_version,
                        $this->_status,
                        self::$statusCode[$this->_status]
-       ));
+        ));
 
         // send response headers
         if ( $this->_nocache === true )
@@ -189,7 +190,7 @@ class Ah_Response
         else
         {
             // MIME type & charset
-            $this->setHeader('Content-Type', "{$this->_mimetype} charset={$this->_charset}");
+            $this->setHeader('Content-Type', "{$this->_mimetype}; charset={$this->_charset}");
 
             // content length
             $this->setHeader('Content-Length', bytelen($this->_body));

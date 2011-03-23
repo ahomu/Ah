@@ -1,8 +1,11 @@
-index.php
-ah/app/action/*
-ah/app/cache/*
-ah/app/template/*
-ah/app/config/*
-ah/app/plugin/*
+!app/action/index.action.php
+!app/action/index.html
+
+app/action/*
+app/cache/*
+app/template/*
+app/config/*
+app/plugin/*
+
 js/
 css/
