@@ -98,6 +98,9 @@ class Ah_Request
             case 'COOKIE'   :
                 $params = $_COOKIE;
                 break;
+            case 'PUT'  ;
+                $params = array(file_get_contents('php://input'));
+                break;
             default     :
                 $params = array();
                 break;
