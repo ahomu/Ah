@@ -8,7 +8,7 @@ interface Ah_Action_Interface
      * @param array $params
      * @return void
      */
-    public function params($params);
+    public function setParams($params);
 
     /**
      * exectute

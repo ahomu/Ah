@@ -20,7 +20,7 @@
  */
 
 require_once(DIR_LIB.'/Ah/Autoloader.ah.php');
-require_once(DIR_LIB.'/Function.php');
+require_once(DIR_LIB.'/function.php');
 
 $Loader = new Ah_Autoloader();
 $Loader->register(array($Loader, 'ahLoad'), true);

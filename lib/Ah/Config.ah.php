@@ -39,6 +39,7 @@ class Ah_Config
             if ( !empty(self::$RAM[$key][$needle]) ) {
                 return self::$RAM[$key][$needle];
             } else {
+                // TODO exception: throw undfined index config
                 return false;
             }
         } else {

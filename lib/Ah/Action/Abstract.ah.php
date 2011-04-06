@@ -37,12 +37,12 @@ abstract class Ah_Action_Abstract
     }
 
     /**
-     * params
+     * setParams
      *
      * @param array $params
      * @return void
      */
-    public function params($params)
+    public function setParams($params)
     {
         $this->Params = new Ah_Params($this->_receive_params, $params, $this->_default_charset);
 

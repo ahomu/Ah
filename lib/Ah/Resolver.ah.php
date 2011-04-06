@@ -106,7 +106,7 @@ class Ah_Resolver
             $Action = Ah_Resolver::_actionDispatcher($path);
 
             // set params
-            $Action->params($params);
+            $Action->setParams($params);
 
             // #EVENT action before
             Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject($Action, 'resolver.action_before'));

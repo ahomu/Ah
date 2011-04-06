@@ -7,7 +7,7 @@ define('DIR_TMP',  DIR_ROOT.'/app/cache');
 define('DIR_TPL',  DIR_ROOT.'/app/template');
 define('DIR_YML',  DIR_ROOT.'/app/config');
 
-require_once('./lib/Bootstrap.php');
+require_once('./lib/bootstrap.php');
 
 class MyApp extends Ah_Application
 {
