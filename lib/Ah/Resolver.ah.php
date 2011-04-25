@@ -61,7 +61,7 @@ class Ah_Resolver
         if ( empty($params) ) {
             $params = Ah_Resolver::_argumentsMapper($path, $method);
         }
-        return self::_run($path, $method, $params, 'printing');
+        return self::_run($path, $method, $params, 'includes');
     }
 
     /**
@@ -78,8 +78,7 @@ class Ah_Resolver
         }
         if ( !preg_match('/^https?:\/\//', $path) ) {
             $host = Ah_Request::getHost();
-            $ssl  = Ah_Request::isSsl();
-            $path = ($ssl ? 'https://' : 'http://').$host.$path;
+            $path = (Ah_Request::isSsl() ? 'https://' : 'http://').$host.$path;
         }
 
         $Res = new Ah_Response();
@@ -102,7 +101,11 @@ class Ah_Resolver
         // TODO task: 例外時の処理を外に出す
         try
         {
+            // resolve variables
             $method = strtolower($method);
+            $path   = preg_replace('/(\.'.Ah_Request::getExtension().')$/', '', $path);
+
+            // dispatch Action
             $Action = Ah_Resolver::_actionDispatcher($path);
 
             // set params
@@ -119,6 +122,13 @@ class Ah_Resolver
 
             return $Action->$final();
         }
+        // TODO issue: Actionの外で投げられる例外のレスポンスボディのデフォルトを定義する(json or html or xmlなど)
+        // 各種エラー系ステータスコードのデフォルトテンプレートを各種の形式で用意（集積的なエラーレスポンスメソッド）
+        // エラーレスポンスメソッドは，Actionからも利用できるようにする
+        // 拡張子が自動決定される際は，Ah_Request::getExtension か Paramsのformatプロパティ が参照される
+        // internalのときはpath上の拡張子は利用できない（除去はされるが，Requestクラスに保存されないので，それ以後に参照しようがない）
+        // internalのときは，安易に例外を投げて内部的な404や405を返していいのか？
+        //     -> internalであっても404や405は開発者がつくってる最中に出くわす不注意によるエラーなので止めてok
         catch ( Ah_Exception_MethodNotAllowed $e )
         {
             $Res = new Ah_Response();

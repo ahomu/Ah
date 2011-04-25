@@ -17,7 +17,20 @@ class Ah_Request
      */
     public static function getHost()
     {
-        return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
+        return isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
+    }
+
+    /**
+     * getPort
+     *
+     * @return int|null
+     */
+    public static function getPort()
+    {
+        if ( preg_match('@[^:]+:(\d+)$@', self::getHost(), $match) ) {
+            return intval($match[1]);
+        }
+        return null;
     }
 
     /**
@@ -27,7 +40,7 @@ class Ah_Request
      */
     public static function getUri()
     {
-        return $_SERVER['REQUEST_URI'];
+        return (self::isSsl() ? 'https' : 'http').'://'.self::getHost().(!!self::getPort() ? ':'.self::getPort() : '').'/';
     }
 
     /**
@@ -37,7 +50,7 @@ class Ah_Request
      */
     public static function getPath()
     {
-        return preg_replace('/\/?(\?.*)?$/', '', self::getUri());
+        return preg_replace('/\/?(\?.*)?$/', '', $_SERVER['REQUEST_URI']);
     }
 
     /**
@@ -48,6 +61,39 @@ class Ah_Request
     public static function getMethod()
     {
         return strtoupper($_SERVER['REQUEST_METHOD']);
+    }
+
+    /**
+     * getExtension
+     *
+     * @return null|string
+     */
+    public static function getExtension()
+    {
+        if ( preg_match('@\.(\w+)$@', self::getPath(), $match) ) {
+            return strval($match[1]);
+        }
+        return null;
+    }
+
+    /**
+     * getReferer
+     *
+     * @return string
+     */
+    public static function getReferer()
+    {
+        return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+    }
+
+    /**
+     * getUa
+     *
+     * @return string
+     */
+    public static function getUa()
+    {
+        return isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
     }
 
     /**
@@ -83,7 +129,7 @@ class Ah_Request
     /**
      * getParams
      *
-     * @param string $type ( GET, POST, COOKIE )
+     * @param string $type ( GET, POST, COOKIE, PUT )
      * @return bool
      */
     public static function getParams($type)
