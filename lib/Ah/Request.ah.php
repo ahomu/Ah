@@ -11,9 +11,9 @@
 class Ah_Request
 {
     /**
-     * getHost
+     * ホストを取得する．ポートが含まれている場合は，それも含む．
      *
-     * @return $host
+     * @return string
      */
     public static function getHost()
     {
@@ -21,7 +21,7 @@ class Ah_Request
     }
 
     /**
-     * getPort
+     * ホスト部に含まれるポートを取得する
      *
      * @return int|null
      */
@@ -34,29 +34,65 @@ class Ah_Request
     }
 
     /**
-     * getUri
+     * スキーム・ホスト・ポートまでのURIを取得する
      *
-     * @return $uri
+     * @return string
      */
-    public static function getUri()
+    public static function getRootUri()
     {
-        return (self::isSsl() ? 'https' : 'http').'://'.self::getHost().(!!self::getPort() ? ':'.self::getPort() : '').'/';
+        return (self::isSsl() ? 'https' : 'http').'://'.self::getHost().'/';
     }
 
     /**
-     * getPath
+     * リクエストURIを取得する．
      *
-     * @return mixed
+     * @return string
+     */
+    public static function getRequestUri()
+    {
+        return $_SERVER['REQUEST_URI'];
+    }
+
+    /**
+     * フロントコントローラまでのパスを取得する．
+     *
+     * @return string
+     */
+    public static function getBaseUri()
+    {
+        $script_name = $_SERVER['SCRIPT_NAME'];
+        $request_uri = self::getRequestUri();
+
+        if ( strpos($request_uri, $script_name) === 0 ) {
+            return $script_name;
+        } elseif ( strpos($request_uri, dirname($script_name)) ) {
+            return rtrim(dirname($script_name), '/');
+        }
+
+        return '';
+    }
+
+    /**
+     * リクエストパスを取得する．
+     *
+     * @return string
      */
     public static function getPath()
     {
-        return preg_replace('/\/?(\?.*)?$/', '', $_SERVER['REQUEST_URI']);
+        $base_uri    = self::getBaseUri();
+        $request_uri = self::getRequestUri();
+
+        if ( false !== ($pos = strpos($request_uri, '?')) ) {
+            $request_uri = substr($request_uri, 0, $pos);
+        }
+
+        return substr($request_uri, strlen($base_uri));
     }
 
     /**
-     * getMethod
+     * リクエストメソッドを取得する．
      *
-     * @return $method
+     * @return string
      */
     public static function getMethod()
     {
@@ -64,7 +100,7 @@ class Ah_Request
     }
 
     /**
-     * getExtension
+     * リクエスト中の拡張子を取得する．
      *
      * @return null|string
      */
@@ -77,7 +113,7 @@ class Ah_Request
     }
 
     /**
-     * getReferer
+     * リファラを取得する．
      *
      * @return string
      */
@@ -87,7 +123,7 @@ class Ah_Request
     }
 
     /**
-     * getUa
+     * ユーザーエージェントを取得する．
      *
      * @return string
      */
@@ -97,9 +133,9 @@ class Ah_Request
     }
 
     /**
-     * isSsl
+     * SSL通信であるかを判断する．
      *
-     * @return $bool
+     * @return bool
      */
     public static function isSsl()
     {
@@ -107,9 +143,9 @@ class Ah_Request
     }
 
     /**
-     * isXhr - XHRであるかを調べる．X_REQUESTED_WITHの指定は，JavaScript側のライブラリ実装に依存する．
-     *
-     * @return $bool
+     * XHRであるかを判断する．X_REQUESTED_WITHの指定は，JavaScript側のライブラリ実装に依存する．
+
+     * @return bool
      */
     public static function isXhr()
     {
@@ -117,7 +153,7 @@ class Ah_Request
     }
 
     /**
-     * isAcceptGzip
+     * gzipが許可されているかを判断する．
      *
      * @return bool
      */
@@ -127,7 +163,7 @@ class Ah_Request
     }
 
     /**
-     * getParams
+     * リクエストメソッドに応じて，パラメータを取得する．
      *
      * @param string $type ( GET, POST, COOKIE, PUT )
      * @return bool
