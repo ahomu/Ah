@@ -2,7 +2,7 @@
 
 /* * * * * * * * * * * * * * * * * * * * * * *
  *
- * "Ah" - PHP Application Framework
+ * "Ah" - PHP WebAPI Framework
  *
  * * * * * * * * * * * * * * * * * * * * * * *
  *

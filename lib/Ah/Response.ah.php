@@ -10,8 +10,7 @@
  */
 class Ah_Response
 {
-    const
-        _version    = '1.1';
+    const HTTP_VERSION  = '1.1';
 
     private
         $_charset   = 'UTF-8',
@@ -163,32 +162,26 @@ class Ah_Response
      */
     public function send()
     {
-        // first version & response code
+        // status line
         header(sprintf('HTTP/%s %s %s',
-                       self::_version,
+                       self::HTTP_VERSION,
                        $this->_status,
                        self::$statusCode[$this->_status]
         ));
 
         // send response headers
-        if ( $this->_nocache === true )
-        {
+        if ( $this->_nocache === true ) {
             // no nocache
             $this->setHeader('Cache-Control', 'no-cache');
-        }
-        elseif ( !empty($this->_cache) )
-        {
+        } elseif ( !empty($this->_cache) ) {
             // cache control
             $this->setHeader('Cache-Control', $this->_cache);
         }
 
-        if ( $this->_location !== null )
-        {
+        if ( $this->_location !== null ) {
             // redirect location
             $this->setHeader('Location', $this->_location);
-        }
-        else
-        {
+        } else {
             // MIME type & charset
             $this->setHeader('Content-Type', "{$this->_mimetype}; charset={$this->_charset}");
 

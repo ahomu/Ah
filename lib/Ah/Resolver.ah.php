@@ -103,6 +103,8 @@ class Ah_Resolver
         {
             // resolve variables
             $method = strtolower($method);
+
+            // remove extension
             $path   = preg_replace('/(\.'.Ah_Request::getExtension().')$/', '', $path);
 
             // dispatch Action
