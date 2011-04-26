@@ -2,7 +2,7 @@
 
 namespace Ah;
 
-use Ah\Exeception;
+use Ah\Exception;
 
 /**
  * Autoloader
