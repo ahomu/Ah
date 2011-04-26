@@ -1,13 +1,10 @@
-<IfModule mod_rewrite.c>
-  RewriteEngine On
+RewriteEngine On
 
-  #RewriteBase /
+#RewriteBase /
 
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_URI} (.*(^|/)[^\./]+)$
-  RewriteRule .* %1/ [L,R=301]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} (.*(^|/)[^\./]+)$
+RewriteRule .* %1/ [L,R=301]
 
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule ^(.*)$ index.php [QSA,L]
-
-</IfModule>
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php [QSA,L]

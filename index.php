@@ -1,31 +1,34 @@
 <?php
 
+namespace Ah;
+
 define('DIR_ROOT', dirname(__FILE__));
-define('DIR_LIB',  DIR_ROOT.'/lib');
-define('DIR_ACT',  DIR_ROOT.'/app/action');
+define('DIR_LIB',  DIR_ROOT.'/libraries');
+
 define('DIR_TMP',  DIR_ROOT.'/app/cache');
-define('DIR_TPL',  DIR_ROOT.'/app/template');
 define('DIR_YML',  DIR_ROOT.'/app/config');
+define('DIR_ACT',  DIR_ROOT.'/app/libraries/Action');
+define('DIR_TPL',  DIR_ROOT.'/app/template');
 
-require_once('./lib/bootstrap.php');
+require_once('./libraries/bootstrap.php');
 
-class MyApp extends Ah_Application
+class MyApp extends Application
 {
     /**
      * boot
      *
      * @param boolean $isDebug
-     * @see Ah_Application::initialize()
+     * @see Ah\Application::initialize()
      * @return void
      */
     public static function boot($isDebug)
     {
         parent::initialize($isDebug);
 
-        $path   = Ah_Request::getPath();
-        $method = Ah_Request::getMethod();
+        $path   = Request::getPath();
+        $method = Request::getMethod();
 
-        Ah_Resolver::external($path, $method);
+        Resolver::external($path, $method);
     }
 }
 

@@ -1,26 +1,29 @@
 <?php
+
+namespace Ah\Event;
+
 /**
- * Ah_Event_Helper
+ * Helper
  *
  * @package     Ah
  * @subpackage  Event
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Event_Helper
+class Helper
 {
     private static $_dispatcher;
 
     /**
      * getDispatcher
      *
-     * @return $object Ah_Event_Dispatcher
+     * @return \Ah\Event\Dispatcher
      */
     public static function getDispatcher()
     {
-        if ( !(self::$_dispatcher instanceof Ah_Event_Dispatcher) ) {
-            self::$_dispatcher = new Ah_Event_Dispatcher();
+        if ( !(self::$_dispatcher instanceof Dispatcher) ) {
+            self::$_dispatcher = new Dispatcher();
         }
         return self::$_dispatcher;
     }

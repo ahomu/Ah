@@ -1,14 +1,18 @@
 <?php
 
+namespace Ah;
+
+use Ah\Event;
+
 /**
- * Ah_Resolver provides URI routing and resolve request.
+ * Ah\Resolver provides URI routing and resolve request.
  *
  * @package     Ah
  * @copyright   2010 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Resolver
+class Resolver
 {
     /**
      * external - external action and send response
@@ -20,11 +24,11 @@ class Ah_Resolver
     public static function external($path, $method)
     {
         // map args
-        $params = Ah_Resolver::_argumentsMapper($path, $method);
+        $params = self::_argumentsMapper($path, $method);
 
         // set params
         if ( empty($params) ) {
-            $params = Ah_Request::getParams($method);
+            $params = Request::getParams($method);
         }
 
         return self::_run($path, $method, $params, 'output');
@@ -42,7 +46,7 @@ class Ah_Resolver
     {
         // map args
         if ( empty($params) ) {
-            $params = Ah_Resolver::_argumentsMapper($path, $method);
+            $params = self::_argumentsMapper($path, $method);
         }
         return self::_run($path, $method, $params, 'passing');
     }
@@ -59,7 +63,7 @@ class Ah_Resolver
     {
         // map args
         if ( empty($params) ) {
-            $params = Ah_Resolver::_argumentsMapper($path, $method);
+            $params = self::_argumentsMapper($path, $method);
         }
         return self::_run($path, $method, $params, 'includes');
     }
@@ -77,11 +81,11 @@ class Ah_Resolver
             $path .= '?'.http_build_query($params);
         }
         if ( !preg_match('/^https?:\/\//', $path) ) {
-            $host = Ah_Request::getHost();
-            $path = (Ah_Request::isSsl() ? 'https://' : 'http://').$host.$path;
+            $host = Request::getHost();
+            $path = (Request::isSsl() ? 'https://' : 'http://').$host.$path;
         }
 
-        $Res = new Ah_Response();
+        $Res = new Response();
         $Res->setStatusCode(303);
         $Res->setLocation($path);
         $Res->send();
@@ -105,22 +109,22 @@ class Ah_Resolver
             $method = strtolower($method);
 
             // remove extension
-            $path   = preg_replace('/(\.'.Ah_Request::getExtension().')$/', '', $path);
+            $path   = preg_replace('/(\.'.Request::getExtension().')$/', '', $path);
 
             // dispatch Action
-            $Action = Ah_Resolver::_actionDispatcher($path);
+            $Action = self::_actionDispatcher($path);
 
             // set params
             $Action->setParams($params);
 
             // #EVENT action before
-            Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject($Action, 'resolver.action_before'));
+            Event\Helper::getDispatcher()->notify(new Event\Subject($Action, 'resolver.action_before'));
 
             // action execute
             $Action->execute($method);
 
             // #EVENT action after
-            Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject($Action, 'resolver.action_after'));
+            Event\Helper::getDispatcher()->notify(new Event\Subject($Action, 'resolver.action_after'));
 
             return $Action->$final();
         }
@@ -131,9 +135,9 @@ class Ah_Resolver
         // internalのときはpath上の拡張子は利用できない（除去はされるが，Requestクラスに保存されないので，それ以後に参照しようがない）
         // internalのときは，安易に例外を投げて内部的な404や405を返していいのか？
         //     -> internalであっても404や405は開発者がつくってる最中に出くわす不注意によるエラーなので止めてok
-        catch ( Ah_Exception_MethodNotAllowed $e )
+        catch ( \Ah_Exception_MethodNotAllowed $e )
         {
-            $Res = new Ah_Response();
+            $Res = new Response();
             $Res->setStatusCode(405);
             $Res->setHeader('Allow', $e->getMessage());
             $Res->setBody(
@@ -148,9 +152,9 @@ class Ah_Resolver
             );
             $Res->send();
         } 
-        catch ( Ah_Exception_NotFound $e )
+        catch ( \Ah_Exception_NotFound $e )
         {
-            $Res = new Ah_Response();
+            $Res = new Response();
             $Res->setStatusCode(404);
             $Res->setBody(
                  '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
@@ -164,7 +168,7 @@ class Ah_Resolver
             );
             $Res->send();
         }
-        catch ( Exception $e )
+        catch ( \Exception $e )
         {
             die('Unspecified Exception: '.$e->getMessage());
         }
@@ -191,8 +195,8 @@ class Ah_Resolver
 
         $Action = new $actionName();
 
-        if ( !$Action instanceof Ah_Action_Interface ) {
-            throw new Exception('Calling '.$actionName.' class does not implement Action_Interface.');
+        if ( !$Action instanceof \Ah\Action\Base ) {
+            throw new \Exception('Calling '.$actionName.' class does not implement Action_Interface.');
         }
 
         return $Action;
@@ -209,7 +213,7 @@ class Ah_Resolver
     {
         // TODO issue: yamlファイル定義以外のマッピングを考える
 
-        $map = Ah_Config::load('map', 'arguments_mapper');
+        $map = Config::load('map', 'arguments_mapper');
         if ( empty($map[$method]) ) return array();
 
         foreach ( $map[$method] as $path => $args ) {

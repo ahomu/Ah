@@ -1,7 +1,9 @@
 <?php
 
+namespace Ah\Debug;
+
 /**
- * Ah_Debug_Renderer
+ * Ah\Debug\Renderer
  *
  * @package     Ah
  * @subpackage  Debug
@@ -9,7 +11,7 @@
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Debug_Renderer
+class Renderer
 {
     private static
         $_store;

@@ -1,6 +1,6 @@
 <?php
 
-class View_Template extends View_Abstract
+class View_Template extends \Ah\View\Base
 {
     private $tpl;
 

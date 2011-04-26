@@ -1,6 +1,6 @@
 <?php
 
-class View_Json extends View_Abstract
+class View_Json extends \Ah\View\Base
 {
     private $_json;
 

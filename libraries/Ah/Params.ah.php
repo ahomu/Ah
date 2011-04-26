@@ -1,14 +1,16 @@
 <?php
 
+namespace Ah;
+
 /**
- * Ah_Params
+ * Ah\Params
  *
  * @package     Ah
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Params
+class Params
 {
     private
         $_allows,
@@ -21,7 +23,7 @@ class Ah_Params
      *
      * @param array $allows
      * @param array $params
-     * @return void
+     * @param null|string $charset
      */
     public function __construct($allows, $params, $charset = null)
     {
@@ -88,11 +90,11 @@ class Ah_Params
     /**
      * validate
      *
-     * @param array $validate_condition_hash
+     * @param array $rule
      * @param Ah_Validator $Validator
      * @return void
      */
-    public function validate($rule, Ah_Validator $Validator)
+    public function validate($rule, Validator $Validator)
     {
         $this->_validator = $Validator->validate($rule, $this->_params);
     }
@@ -110,7 +112,7 @@ class Ah_Params
     /**
      * isValid
      *
-     * @param string $params key
+     * @param string $key
      * @return boolean
      */
     public function isValid($key)

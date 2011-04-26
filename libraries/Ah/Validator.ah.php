@@ -1,7 +1,9 @@
 <?php
 
+namespace Ah;
+
 /**
- * Ah_Validator
+ * Ah\Validator
  *
  * @package     Ah
  * @copyright   2010 ayumusato.com
@@ -9,7 +11,7 @@
  * @author      Ayumu Sato
  */
 // TODO issue: ユーザー拡張のエンドポイントを考える
-class Ah_Validator
+class Validator
 {
     private
         $_temporary,
@@ -18,9 +20,9 @@ class Ah_Validator
     /**
      * validate
      *
-     * @param array $validate_rule
+     * @param array $rule
      * @param array $params
-     * @return Ah_Validator $this
+     * @return Validator
      */
     public function validate($rule, $params)
     {
@@ -51,7 +53,7 @@ class Ah_Validator
     /**
      * isValid
      *
-     * @param string $params key
+     * @param string $key
      * @return boolean
      */
     public function isValid($key)

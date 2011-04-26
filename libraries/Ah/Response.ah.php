@@ -1,14 +1,18 @@
 <?php
 
+namespace Ah;
+
+use Ah\Event;
+
 /**
- * Ah_Response provides managing detail of http response.
+ * Ah\Response provides managing detail of http response.
  *
  * @package     Ah
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Response
+class Response
 {
     const HTTP_VERSION  = '1.1';
 
@@ -122,8 +126,8 @@ class Ah_Response
     /**
      * setHeader
      *
-     * @param string $filed_key
-     * @param string $field_name
+     * @param string $key
+     * @param string $val
      * @return void
      */
     public function setHeader($key, $val)
@@ -157,7 +161,6 @@ class Ah_Response
     /**
      * send
      *
-     * @param string $body
      * @return void
      */
     public function send()
@@ -193,7 +196,7 @@ class Ah_Response
         }
 
         // #EVENT send before
-        Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject($this, 'response.send_before'));
+        Event\Helper::getDispatcher()->notify(new Event\Subject($this, 'response.send_before'));
 
         // send response header
         $this->_sendHeader();
@@ -202,7 +205,7 @@ class Ah_Response
         $this->_sendBody();
 
         // #EVENT send after
-        Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject($this, 'response.send_after'));
+        Event\Helper::getDispatcher()->notify(new Event\Subject($this, 'response.send_after'));
     }
 
     // status code list

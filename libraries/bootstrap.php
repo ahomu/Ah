@@ -19,10 +19,12 @@
  *     /lib/Vendor/sf/sfEventDispatcher.php
  */
 
-require_once(DIR_LIB.'/Ah/Autoloader.ah.php');
-require_once(DIR_LIB.'/function.php');
+namespace Ah;
 
-$Loader = new Ah_Autoloader();
+require_once(DIR_LIB.'/Ah/Autoloader.ah.php');
+require_once(DIR_LIB . '/function.php');
+
+$Loader = new Autoloader();
 $Loader->register(array($Loader, 'ahLoad'), true);
 $Loader->register(array($Loader, 'sfLoad'), true);
 $Loader->register(array($Loader, 'terminate'), true);
@@ -35,7 +37,7 @@ $Loader->register(array($Loader, 'terminate'), true);
  * @license     MIT License
  * @author      Ayumu Sato
  */
-abstract class Ah_Application
+abstract class Application
 {
     /**
      * initialize
@@ -46,7 +48,7 @@ abstract class Ah_Application
     public static function initialize($isDebug = false)
     {
         // #EVENT startup
-        Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject(null, 'app.startup'));
+        Event\Helper::getDispatcher()->notify(new Event\Subject(null, 'app.startup'));
 
         // output buffering
         ob_start();
@@ -72,7 +74,7 @@ abstract class Ah_Application
             ini_set('log_errors', 1);
             ini_set('error_log', './error_log');
 
-            Ah_Debug_Manager::ready();
+            Debug\Manager::ready();
         } else {
             error_reporting(E_ALL);
             ini_set('display_errors', 0);
@@ -85,13 +87,13 @@ abstract class Ah_Application
         {
             $stacks = debug_backtrace();
             $stacks = array_splice($stacks, 1);
-            Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject(array($errno, $errstr, $errfile, $errline, $stacks), 'error.regular'));
+            Event\Helper::getDispatcher()->notify(new Event\Subject(array($errno, $errstr, $errfile, $errline, $stacks), 'error.regular'));
         }, E_ALL);
 
         // #EVENT shutdown
         register_shutdown_function(function()
         {
-            Ah_Event_Helper::getDispatcher()->notify(new Ah_Event_Subject(null, 'app.shutdown'));
+            Event\Helper::getDispatcher()->notify(new Event\Subject(null, 'app.shutdown'));
         });
     }
 }

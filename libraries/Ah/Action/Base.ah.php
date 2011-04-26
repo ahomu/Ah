@@ -1,6 +1,10 @@
 <?php
 
-abstract class Ah_Action_Abstract
+namespace Ah\Action;
+
+use Ah;
+
+abstract class Base
 {
     // TODO issue: メソッドごとにparamsとruleを設定できないのを解決する
 
@@ -29,11 +33,10 @@ abstract class Ah_Action_Abstract
     /**
      * __construct
      *
-     * @return void
      */
     public function __construct()
     {
-        $this->Response = new Ah_Response();
+        $this->Response = new Ah\Response();
     }
 
     /**
@@ -44,13 +47,13 @@ abstract class Ah_Action_Abstract
      */
     public function setParams($params)
     {
-        $this->Params = new Ah_Params($this->_receive_params, $params, $this->_default_charset);
+        $this->Params = new Ah\Params($this->_receive_params, $params, $this->_default_charset);
 
         /**
          * 自動validate
-         * 手動の時は，$this->Params->validate($myRules, new Ah_Validator()) としてActionのメインロジック内で実行する
+         * 手動の時は，$this->Params->validate($myRules, new Validator()) としてActionのメインロジック内で実行する
          */
-        $this->Params->validate($this->_validate_rule, new Ah_Validator());
+        $this->Params->validate($this->_validate_rule, new Ah\Validator());
     }
 
     /**
@@ -70,7 +73,7 @@ abstract class Ah_Action_Abstract
             if ( in_array('put', $methods) ) $allows[]      = 'put';
             if ( in_array('delete', $methods) ) $allows[]   = 'delete';
 
-            throw new Ah_Exception_MethodNotAllowed(strtoupper(implode(', ', $allows)));
+            throw new \Ah_Exception_MethodNotAllowed(strtoupper(implode(', ', $allows)));
         }
 
         $this->$method();
@@ -83,7 +86,7 @@ abstract class Ah_Action_Abstract
      */
     public function output()
     {
-        if ( $this->_allow_external === false ) throw new Exception('External call not allowed');
+        if ( $this->_allow_external === false ) throw new \Exception('External call not allowed');
 
         $this->Response->send();
     }
@@ -95,7 +98,7 @@ abstract class Ah_Action_Abstract
      */
     public function passing()
     {
-        if ( $this->_allow_internal === false ) throw new Exception('Internal call not allowed');
+        if ( $this->_allow_internal === false ) throw new \Exception('Internal call not allowed');
 
         return $this;
     }
@@ -107,7 +110,7 @@ abstract class Ah_Action_Abstract
      */
     public function printing()
     {
-        if ( $this->_allow_includes === false ) throw new Exception('Includes call not allowed');
+        if ( $this->_allow_includes === false ) throw new \Exception('Includes call not allowed');
 
         return $this->Response->getBody();
     }

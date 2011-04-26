@@ -1,14 +1,17 @@
 <?php
+
+namespace Ah\Debug;
+
 /**
- * Ah_Debug_Tracer
+ * Ah\Debug\Tracer
  *
  * @package     Ah
  * @subpackage  Debug
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Debug_Tracer
+class Tracer
 {
     /**
      * regularError
@@ -35,6 +38,6 @@ class Ah_Debug_Tracer
         }
         $ob.= '</table>';
 
-        Ah_Debug_Renderer::add($ob);
+        Renderer::add($ob);
     }
 }

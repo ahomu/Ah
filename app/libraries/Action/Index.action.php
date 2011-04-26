@@ -1,6 +1,6 @@
 <?php
 
-class Action_Index extends Ah_Action_Abstract implements Ah_Action_Interface
+class Action_Index extends \Ah\Action\Base
 {
     protected
         $_receive_params = array(

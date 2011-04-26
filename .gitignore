@@ -1,11 +1,9 @@
-!app/action/index.action.php
-!app/action/index.html
+!app/libraries/Action/index.action.php
+!app/template/index.html
 
-app/action/*
 app/cache/*
 app/template/*
 app/config/*
-app/plugin/*
 
 js/
 css/

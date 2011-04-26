@@ -1,14 +1,16 @@
 <?php
 
+namespace Ah;
+
 /**
- * Ah_Config
+ * Ah\Config
  *
  * @package     Ah
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Config
+class Config
 {
     public static $RAM = array();
 
@@ -24,13 +26,13 @@ class Ah_Config
         if ( !array_key_exists($key, self::$RAM) ) {
             $ymlPath    = DIR_YML."/$key.yml";
 
-            if ( Ah_Cache::isValid($ymlPath, 'config') ) {
-                self::$RAM[$key] = unserialize(Ah_Cache::load($ymlPath, 'config'));
+            if ( Cache::isValid($ymlPath, 'config') ) {
+                self::$RAM[$key] = unserialize(Cache::load($ymlPath, 'config'));
             } else {
-                self::$RAM[$key] = Spyc::YAMLLoad($ymlPath);
+                self::$RAM[$key] = \Spyc::YAMLLoad($ymlPath);
                 if ( !empty(self::$RAM[$key]) )
                 {
-                    Ah_Cache::save($ymlPath, serialize(self::$RAM[$key]), 'config');
+                    Cache::save($ymlPath, serialize(self::$RAM[$key]), 'config');
                 }
             }
         }

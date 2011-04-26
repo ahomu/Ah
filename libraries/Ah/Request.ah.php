@@ -1,14 +1,16 @@
 <?php
 
+namespace Ah;
+
 /**
- * Ah_Request
+ * Ah\Request
  *
  * @package     Ah
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Request
+class Request
 {
     /**
      * ホストを取得する．ポートが含まれている場合は，それも含む．

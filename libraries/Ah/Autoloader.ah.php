@@ -1,18 +1,23 @@
 <?php
 
+namespace Ah;
+
 /**
- * Ah_Autoloader
+ * Autoloader
  *
+ * @namespace   Ah
  * @package     Ah
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Autoloader
+class Autoloader
 {
     /**
      * register
      *
+     * @param function $func
+     * @param bool $throw
      * @return void
      */
     public function register($func, $throw = false)
@@ -23,25 +28,32 @@ class Ah_Autoloader
     /**
      * ahLoad
      *
+     * @param string $className
      * @return void
      */
     public function ahLoad($className)
     {
-        $prefix = $this->_getUnscoPrefix($className);
+        if ( strpos($className, '\\') !== false ) {
+            $separator = '\\';
+        } else {
+            $separator = '_';
+        }
 
-        switch ($prefix) {
+        $package = $this->_getPackage($className, $separator);
+
+        switch ($package) {
             case 'Ah'       :
-                $this->ahCoreLoad($className);
+                $this->ahCoreLoad($className, $separator);
                 break;
             case 'Action'   :
-                $this->ahActionLoad($className);
+                $this->ahActionLoad($className, $separator);
                 break;
             // TODO issue: 'View' will rename to 'Surface'
             case 'View'     :
-                $this->ahViewLoad($className);
+                $this->ahViewLoad($className, $separator);
                 break;
             default         :
-                $this->ahCommonLoad($className);
+                $this->ahCommonLoad($className, $separator);
                 break;
         }
 
@@ -99,59 +111,67 @@ class Ah_Autoloader
      */
     public function sfLoad($className)
     {
-        $classPath = DIR_LIB.'/Vendor/sf/'.$className.'.php';
-        $this->_load($classPath);
+        $filePath = DIR_LIB.'/Vendor/sf/'.$className.'.php';
+        $this->_load($filePath);
     }
 
     /**
-     * _getUnscoPrefix
+     * _getPackage
      *
      * @param string $className
+     * @param string $needle
      * @return string
      */
-    private function _getUnscoPrefix($className)
+    private function _getPackage($className, $needle)
     {
-        return substr($className, 0, strpos($className, '_'));
+        return substr($className, 0, strpos($className, $needle));
     }
 
     /**
      * _traversal
      *
+     * @param string $basepath
      * @param string $className
-     * @param string $extension
      * @param string $prefix
+     * @return void
      */
     private function _traversal($basepath, $className, $prefix = null)
     {
+        if ( strpos($className, '\\') !== false ) {
+            $separator = '\\';
+        } else {
+            $separator = '_';
+        }
+
         if ( $prefix !== null ) {
             $extension = '.'.strtolower($prefix);
-            $className = substr($className, strlen($prefix.'_'));
+            $className = substr($className, strlen($prefix.$separator));
         } else {
             $extension = '';
         }
 
-        $chunks     = explode('_', $className);
+        $chunks     = explode($separator, $className);
         $pathStack = array($basepath);
 
         foreach ( $chunks as $chunk ) {
             $pathStack[] = $chunk;
         }
 
-        $classPath  = implode('/', $pathStack)."$extension.php";
+        $filePath  = implode('/', $pathStack)."$extension.php";
 
-        $this->_load($classPath);
+        $this->_load($filePath);
     }
 
     /**
      * _load
      *
-     * @param string $classPath
+     * @param string $filePath
      * @return void
      */
-    private function _load($classPath)
+    private function _load($filePath)
     {
-        if ( is_readable($classPath) ) {
-            require_once($classPath);
+        if ( is_readable($filePath) ) {
+            require_once($filePath);
         }
     }
 
@@ -164,6 +184,6 @@ class Ah_Autoloader
      */
     public function terminate($className)
     {
-        throw new Ah_Exception_NotFound($className);
+        throw new \Ah_Exception_NotFound($className);
     }
 }

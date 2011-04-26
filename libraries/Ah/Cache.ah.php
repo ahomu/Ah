@@ -1,14 +1,16 @@
 <?php
 
+namespace Ah;
+
 /**
- * Ah_Cache
+ * Ah\Cache
  *
  * @package     Ah
  * @copyright   2010 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Cache
+class Cache
 {
     public static function isValid($realPath, $ns = null)
     {

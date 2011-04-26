@@ -63,20 +63,20 @@ Ah_Resolverクラスはexternalとinternalとredirectというスタティック
 ###各メソッドの呼び出し例
 
 ####external
-    $path   = Ah_Request::getPath();
-    $method = Ah_Request::getMethod();
-    Ah_Resolver::external($path, $method);
+    $path   = \Ah\Request::getPath();
+    $method = \Ah\Request::getMethod();
+    \Ah\Resolver::external($path, $method);
 
 ####internal
-    Ah_Resolver::internal('/hoge/fuga', 'POST');
+    \Ah\Resolver::internal('/hoge/fuga', 'POST');
     Action_Hoge_Fuga::post()
 
 ####includes
-    Ah_Resolver::includes('/hoge', 'GET');
+    \Ah\Resolver::includes('/hoge', 'GET');
     Action_Hoge::get()
 
 ####redirect
-    Ah_Resolver::redirect('http://example.com');
+    \Ah\Resolver::redirect('http://example.com');
 
 
 
@@ -86,7 +86,7 @@ Ah_Resolverクラスはexternalとinternalとredirectというスタティック
 
     <?php
 
-    class Action_Index extends Ah_Action_Abstract implements Ah_Action_Interface
+    class Action_Index extends \Ah\Action\Abstract
     {
         protected
             // 引数として受け取れるパラメーターの定義
@@ -106,12 +106,12 @@ Ah_Resolverクラスはexternalとinternalとredirectというスタティック
              * サンプルリクエスト
              * GET /?hoge=fuga
              *
-             * + Ah_Params $this->Params
-             * Ah_Resolver::externalから呼ばれた場合はリクエストがGETであれば$_GETが，POSTであれば$_POSTが自動セットされる．
+             * + \Ah\Params $this->Params
+             * \Ah\Resolver::externalから呼ばれた場合はリクエストがGETであれば$_GETが，POSTであれば$_POSTが自動セットされる．
              * internalから呼ばれた場合は，第3引数に指定された連想配列が自動セットされる
              *
-             * + Ah_Response $this->Response
-             * HTTPレスポンスを管理する．Ah_Resolver::externalから呼ばれた場合はクライアントに返されるが，
+             * + \Ah\Response $this->Response
+             * HTTPレスポンスを管理する．\Ah\Resolver::externalから呼ばれた場合はクライアントに返されるが，
              * internalから呼ばれた場合は，レスポンスは実行されず，ActionインスタンスがResponseを内包したまま返される．
              *
              */

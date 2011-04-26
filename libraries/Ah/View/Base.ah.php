@@ -1,11 +1,12 @@
 <?php
 
-abstract class View_Abstract
+namespace Ah\View;
+
+abstract class Base
 {
     /**
      * __construct
      *
-     * @return void
      */
     public function __construct()
     {

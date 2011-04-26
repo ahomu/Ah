@@ -1,14 +1,16 @@
 <?php
 
+namespace Ah;
+
 /**
- * Ah_Session
+ * Ah\Session
  *
  * @package     Ah
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Session extends ArrayObject implements IteratorAggregate
+class Session extends \ArrayObject implements \IteratorAggregate
 {
     private static $INSTANCE;
 
