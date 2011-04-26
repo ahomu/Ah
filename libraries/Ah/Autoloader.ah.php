@@ -7,7 +7,6 @@ use Ah\Exception;
 /**
  * Autoloader
  *
- * @namespace   Ah
  * @package     Ah
  * @copyright   2011 ayumusato.com
  * @license     MIT License

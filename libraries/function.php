@@ -143,7 +143,7 @@ function is_serialized($val){
  * http://zombiebook.seesaa.net/article/33192046.html
  *
  * @param mixed $data
- * @retrn int $length
+ * @return int $length
  */
 function bytelen($data)
 {
@@ -243,7 +243,7 @@ function escapeParameter(&$key, &$val, $charset = 'UTF-8')
 }
 
 /**
- * @overwrite json decode & encode functions.
+ * overwrite json decode & encode functions.
  */
 if ( !function_exists('json_decode') ) {
     function json_decode($content, $assoc=false)

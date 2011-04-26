@@ -99,7 +99,7 @@ class Resolver
      * @param string $method
      * @param array $params
      * @param string $final
-     * @return object $Action
+     * @return object|bool
      */
     private static function _run($path, $method, $params, $final)
     {
@@ -152,7 +152,7 @@ class Resolver
                 .'</body></html>'
             );
             $Res->send();
-        } 
+        }
         catch ( \Ah\Exception\NotFound $e )
         {
             $Res = new Response();
@@ -173,6 +173,8 @@ class Resolver
         {
             die('Unspecified Exception: '.$e->getMessage());
         }
+
+        return false;
     }
 
     /**

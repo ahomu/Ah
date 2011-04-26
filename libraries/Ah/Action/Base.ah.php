@@ -5,6 +5,15 @@ namespace Ah\Action;
 use Ah,
     Ah\Exception;
 
+/**
+ * Base
+ *
+ * @package     Ah
+ * @subpackage  Action
+ * @copyright   2011 ayumusato.com
+ * @license     MIT License
+ * @author      Ayumu Sato
+ */
 abstract class Base
 {
     // TODO issue: メソッドごとにparamsとruleを設定できないのを解決する
