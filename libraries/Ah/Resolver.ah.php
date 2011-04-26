@@ -2,13 +2,14 @@
 
 namespace Ah;
 
-use Ah\Event;
+use Ah\Event,
+    Ah\Exception;
 
 /**
  * Ah\Resolver provides URI routing and resolve request.
  *
  * @package     Ah
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
@@ -135,7 +136,7 @@ class Resolver
         // internalのときはpath上の拡張子は利用できない（除去はされるが，Requestクラスに保存されないので，それ以後に参照しようがない）
         // internalのときは，安易に例外を投げて内部的な404や405を返していいのか？
         //     -> internalであっても404や405は開発者がつくってる最中に出くわす不注意によるエラーなので止めてok
-        catch ( \Ah_Exception_MethodNotAllowed $e )
+        catch ( \Ah\Exception\MethodNotAllowed $e )
         {
             $Res = new Response();
             $Res->setStatusCode(405);
@@ -152,7 +153,7 @@ class Resolver
             );
             $Res->send();
         } 
-        catch ( \Ah_Exception_NotFound $e )
+        catch ( \Ah\Exception\NotFound $e )
         {
             $Res = new Response();
             $Res->setStatusCode(404);
@@ -196,7 +197,7 @@ class Resolver
         $Action = new $actionName();
 
         if ( !$Action instanceof \Ah\Action\Base ) {
-            throw new \Exception('Calling '.$actionName.' class does not implement Action_Interface.');
+            throw new Exception\ExtendsRequired('Calling '.$actionName.' class does not extend \Ah\Action\Base.');
         }
 
         return $Action;

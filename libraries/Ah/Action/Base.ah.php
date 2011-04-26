@@ -2,7 +2,8 @@
 
 namespace Ah\Action;
 
-use Ah;
+use Ah,
+    Ah\Exception;
 
 abstract class Base
 {
@@ -73,7 +74,7 @@ abstract class Base
             if ( in_array('put', $methods) ) $allows[]      = 'put';
             if ( in_array('delete', $methods) ) $allows[]   = 'delete';
 
-            throw new \Ah_Exception_MethodNotAllowed(strtoupper(implode(', ', $allows)));
+            throw new Exception\MethodNotAllowed(strtoupper(implode(', ', $allows)));
         }
 
         $this->$method();
@@ -86,7 +87,7 @@ abstract class Base
      */
     public function output()
     {
-        if ( $this->_allow_external === false ) throw new \Exception('External call not allowed');
+        if ( $this->_allow_external === false ) throw new Exception\ExecuteNotAllowed('External call not allowed');
 
         $this->Response->send();
     }
@@ -98,7 +99,7 @@ abstract class Base
      */
     public function passing()
     {
-        if ( $this->_allow_internal === false ) throw new \Exception('Internal call not allowed');
+        if ( $this->_allow_internal === false ) throw new Exception\ExecuteNotAllowed('Internal call not allowed');
 
         return $this;
     }
@@ -110,7 +111,7 @@ abstract class Base
      */
     public function printing()
     {
-        if ( $this->_allow_includes === false ) throw new \Exception('Includes call not allowed');
+        if ( $this->_allow_includes === false ) throw new Exception\ExecuteNotAllowed('Includes call not allowed');
 
         return $this->Response->getBody();
     }

@@ -1,7 +1,9 @@
 <?php
 
+namespace Ah\Exception;
+
 /**
- * Ah_Exception_NotFound
+ * Ah\Exception\NotFound
  *
  * @package     Ah
  * @subpackage  Exception
@@ -9,7 +11,7 @@
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Exception_NotFound extends Exception
+class NotFound extends \RuntimeException
 {
     // @message Requested Action Class Name.
 }

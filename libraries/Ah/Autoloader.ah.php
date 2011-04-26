@@ -2,6 +2,8 @@
 
 namespace Ah;
 
+use Ah\Exeception;
+
 /**
  * Autoloader
  *
@@ -184,6 +186,6 @@ class Autoloader
      */
     public function terminate($className)
     {
-        throw new \Ah_Exception_NotFound($className);
+        throw new Exception\NotFound($className);
     }
 }

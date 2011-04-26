@@ -3,7 +3,7 @@
 namespace Ah\Exception;
 
 /**
- * Ah\Exception\MethodNotAllowed
+ * Ah\Exception\ExecuteNotAllowed
  *
  * @package     Ah
  * @subpackage  Exception
@@ -11,7 +11,7 @@ namespace Ah\Exception;
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class MethodNotAllowed extends \RuntimeException
+class ExecuteNotAllowed extends \LogicException
 {
     // @message Allow http methods. That strigns glue is ', '.
 }
