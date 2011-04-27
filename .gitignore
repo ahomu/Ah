@@ -1,4 +1,4 @@
-!app/libraries/Action/index.action.php
+!app/libraries/action/index.action.php
 !app/template/index.html
 
 app/cache/*

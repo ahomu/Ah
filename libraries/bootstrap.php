@@ -19,9 +19,11 @@
  *     /lib/Vendor/sf/sfEventDispatcher.php
  */
 
-namespace Ah;
+namespace ah;
 
-require_once(DIR_LIB.'/Ah/Autoloader.ah.php');
+use ah\event;
+
+require_once(DIR_LIB . '/ah/Autoloader.ah.php');
 require_once(DIR_LIB . '/function.php');
 
 $Loader = new Autoloader();
@@ -30,7 +32,7 @@ $Loader->register(array($Loader, 'sfLoad'), true);
 $Loader->register(array($Loader, 'terminate'), true);
 
 /**
- * Ah_Application
+ * ah\Application
  *
  * @package     Ah
  * @copyright   2010 ayumusato.com
@@ -48,7 +50,7 @@ abstract class Application
     public static function initialize($isDebug = false)
     {
         // #EVENT startup
-        Event\Helper::getDispatcher()->notify(new Event\Subject(null, 'app.startup'));
+        event\Helper::getDispatcher()->notify(new event\Subject(null, 'app.startup'));
 
         // output buffering
         ob_start();
@@ -74,7 +76,7 @@ abstract class Application
             ini_set('log_errors', 1);
             ini_set('error_log', './error_log');
 
-            Debug\Manager::ready();
+            debug\Manager::ready();
         } else {
             error_reporting(E_ALL);
             ini_set('display_errors', 0);
@@ -87,13 +89,13 @@ abstract class Application
         {
             $stacks = debug_backtrace();
             $stacks = array_splice($stacks, 1);
-            Event\Helper::getDispatcher()->notify(new Event\Subject(array($errno, $errstr, $errfile, $errline, $stacks), 'error.regular'));
+            event\Helper::getDispatcher()->notify(new event\Subject(array($errno, $errstr, $errfile, $errline, $stacks), 'error.regular'));
         }, E_ALL);
 
         // #EVENT shutdown
         register_shutdown_function(function()
         {
-            Event\Helper::getDispatcher()->notify(new Event\Subject(null, 'app.shutdown'));
+            event\Helper::getDispatcher()->notify(new event\Subject(null, 'app.shutdown'));
         });
     }
 }
