@@ -9,7 +9,6 @@ define('DIR_ROOT',dirname(__FILE__));
 define('DIR_LIB', DIR_ROOT.'/libraries');
 define('DIR_APP', DIR_ROOT.'/app');
 
-define('DIR_APP', DIR_APP);
 define('DIR_TMP', DIR_APP.'/cache');
 define('DIR_YML', DIR_APP.'/config');
 define('DIR_TPL', DIR_APP.'/template');
