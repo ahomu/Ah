@@ -49,10 +49,6 @@ class Autoloader
             case 'action'   :
                 $this->ahActionLoad($className, $separator);
                 break;
-            // TODO issue: 'view' will rename to 'surface'
-            case 'view'     :
-                $this->ahViewLoad($className, $separator);
-                break;
             default         :
                 $this->ahCommonLoad($className, $separator);
                 break;
@@ -68,7 +64,7 @@ class Autoloader
      */
     public function ahActionLoad($className)
     {
-        $this->_traversal(DIR_ACT, $className, 'action');
+        $this->_traversal(DIR_APP, $className);
     }
 
     /**
@@ -79,18 +75,7 @@ class Autoloader
      */
     public function ahCoreLoad($className)
     {
-        $this->_traversal(DIR_LIB.'/ah', $className, 'ah');
-    }
-
-    /**
-     * ahViewLoad
-     *
-     * @param string $className
-     * @return void
-     */
-    public function ahViewLoad($className)
-    {
-        $this->_traversal(DIR_LIB.'/view', $className, 'view');
+        $this->_traversal(DIR_LIB, $className);
     }
 
     /**
@@ -101,7 +86,7 @@ class Autoloader
      */
     public function ahCommonLoad($className)
     {
-        $this->_traversal(DIR_LIB.'/common', $className, null);
+        $this->_traversal(DIR_LIB.'/common', $className);
     }
 
     /**
@@ -133,10 +118,9 @@ class Autoloader
      *
      * @param string $basepath
      * @param string $className
-     * @param string $prefix
      * @return void
      */
-    private function _traversal($basepath, $className, $prefix = null)
+    private function _traversal($basepath, $className)
     {
         if ( strpos($className, '\\') !== false ) {
             $separator = '\\';
@@ -144,21 +128,10 @@ class Autoloader
             $separator = '_';
         }
 
-        if ( $prefix !== null ) {
-            $extension = '.'.strtolower($prefix);
-            $className = substr($className, strlen($prefix.$separator));
-        } else {
-            $extension = '';
-        }
+        $pathStack = explode($separator, $className);
+        array_unshift($pathStack, $basepath);
 
-        $chunks     = explode($separator, $className);
-        $pathStack = array($basepath);
-
-        foreach ( $chunks as $chunk ) {
-            $pathStack[] = $chunk;
-        }
-
-        $filePath  = implode('/', $pathStack)."$extension.php";
+        $filePath  = implode('/', $pathStack).'.php';
 
         $this->_load($filePath);
     }

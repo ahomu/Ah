@@ -1,16 +1,26 @@
 <?php
 
-use ah\Application,
+use ah\Autoloader,
+    ah\Application,
     ah\Request,
     ah\Resolver;
 
-define('DIR_ROOT', dirname(__FILE__));
-define('DIR_LIB',  DIR_ROOT.'/libraries');
+define('DIR_ROOT',dirname(__FILE__));
+define('DIR_LIB', DIR_ROOT.'/libraries');
+define('DIR_APP', DIR_ROOT.'/app');
 
-define('DIR_TMP',  DIR_ROOT.'/app/cache');
-define('DIR_YML',  DIR_ROOT.'/app/config');
-define('DIR_ACT',  DIR_ROOT.'/app/libraries/action');
-define('DIR_TPL',  DIR_ROOT.'/app/template');
+define('DIR_APP', DIR_APP);
+define('DIR_TMP', DIR_APP.'/cache');
+define('DIR_YML', DIR_APP.'/config');
+define('DIR_TPL', DIR_APP.'/template');
+
+require_once(DIR_LIB . '/ah/Autoloader.php');
+require_once(DIR_LIB . '/function.php');
+
+$Loader = new Autoloader();
+$Loader->register(array($Loader, 'ahLoad'), true);
+$Loader->register(array($Loader, 'sfLoad'), true);
+$Loader->register(array($Loader, 'terminate'), true);
 
 require_once('./libraries/bootstrap.php');
 

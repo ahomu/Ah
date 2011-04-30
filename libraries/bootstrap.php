@@ -23,14 +23,6 @@ namespace ah;
 
 use ah\event;
 
-require_once(DIR_LIB . '/ah/Autoloader.ah.php');
-require_once(DIR_LIB . '/function.php');
-
-$Loader = new Autoloader();
-$Loader->register(array($Loader, 'ahLoad'), true);
-$Loader->register(array($Loader, 'sfLoad'), true);
-$Loader->register(array($Loader, 'terminate'), true);
-
 /**
  * ah\Application
  *

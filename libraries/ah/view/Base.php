@@ -16,6 +16,7 @@ abstract class Base
     /**
      * __construct
      *
+     * @return void
      */
     public function __construct()
     {

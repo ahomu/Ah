@@ -17,7 +17,7 @@ use ah\Params,
  * @license     MIT License
  * @author      Ayumu Sato
  */
-abstract class Base
+abstract class Base implements Mold
 {
     // TODO issue: メソッドごとにparamsとruleを設定できないのを解決する
 
@@ -46,6 +46,7 @@ abstract class Base
     /**
      * __construct
      *
+     * @return void
      */
     public function __construct()
     {

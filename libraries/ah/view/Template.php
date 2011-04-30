@@ -50,17 +50,17 @@ class Template extends Base
      */
     public function hasTpl()
     {
-        return is_object($this->tpl);
+        return $this->tpl instanceof \Template;
     }
 
     /**
      * add
      *
-     * @param mixed $blocks
-     * @param mixed $vars
+     * @param null|string|array $blocks
+     * @param array $vars
      * @return chain
      */
-    public function add($blocks=array(), array $vars=array())
+    public function add($blocks = null, $vars = array())
     {
         $this->tpl->add($blocks, $vars);
         return $this;

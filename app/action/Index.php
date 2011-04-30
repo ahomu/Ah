@@ -1,6 +1,10 @@
 <?php
 
-class action_Index extends \ah\action\Base
+namespace action;
+
+use ah\action\Base;
+
+class Index extends Base
 {
     protected
         $_receive_params = array(
@@ -16,7 +20,7 @@ class action_Index extends \ah\action\Base
 
         $View = new \ah\view\Template('index', 'html');
 
-        $this->Response->setMimeType(Util_MIME::detectType('html'));
+        $this->Response->setMimeType(\Util_MIME::detectType('html'));
         $this->Response->setStatusCode(200);
         $this->Response->setBody($View->build($root_vars)->render());
     }

@@ -185,16 +185,13 @@ class Resolver
      */
     private static function _actionDispatcher($path)
     {
-        $chunks = explode('/', strtolower($path));
-        $stacks = array('action');
+        if ( $path === '/' ) $path = '/index';
 
-        foreach ( $chunks as $chunk ) {
-            if ( $chunk === '' ) continue;
-            $stacks[] = ucfirst($chunk);
-        }
+        $stacks = array_clean(explode('/', strtolower($path)));
+        array_unshift($stacks, 'action');
+        array_splice($stacks, -1, 1, ucfirst(end($stacks)));
 
-        if ( count($stacks) === 1 ) $stacks[] = 'Index';
-        $actionName = implode('_', $stacks);
+        $actionName = implode('\\', $stacks);
 
         $Action = new $actionName();
 
@@ -214,8 +211,6 @@ class Resolver
      */
     private static function _argumentsMapper(& $rawPath, $method)
     {
-        // TODO issue: yamlファイル定義以外のマッピングを考える
-
         $map = Config::load('map', 'arguments_mapper');
         if ( empty($map[$method]) ) return array();
 
