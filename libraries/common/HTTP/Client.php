@@ -9,23 +9,6 @@
  * @author      Ayumu Sato
  * @version     Release: 0.7.1
  */
-
-/*
-
-0.6.0 ( 2010-09-16 )
-・メソッドとプロパティを構成変更
-・301, 302, 303, 307 のステータスコード時に、リダイレクトを追えるように変更
-・ダイジェスト認証(algorithm=MD5/qop=auth)に暫定対応
-
-0.7.0 ( 2010-09-17 )
-・リダイレクト処理をHttpHelperに移動
-
-0.7.1 ( 2010-09-23 )
-・HttpHelper::send()は、HttpClientオブジェクトを返すように変更
-・UTF-8以外の入力に未対応
-・multipartに未対応
-
-*/
 class HTTP_Client
 {
     private
@@ -124,13 +107,10 @@ class HTTP_Client
         $this->error    = true;
     }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
      * connect - Initialize and open socket.
      *
      * @param string $url
-     *
      * @return void
      */
     public function connect($url)
@@ -153,7 +133,6 @@ class HTTP_Client
      * reconnect - Socket reopen without initialization.
      *
      * @param string $url
-     *
      * @return void
      */
     public function reconnect($url)
@@ -170,7 +149,6 @@ class HTTP_Client
      * _parseUrl - Parsing url and set property.
      * 
      * @param string $url
-     *
      * @return void
      */
     private function _parseUrl($url)
@@ -204,7 +182,6 @@ class HTTP_Client
      * setMethod - Set http method.
      *
      * @param string $method['GET'|'POST'|'PUT'|'DELETE']
-     *
      * @return void
      */
     public function setMethod($method)
@@ -218,7 +195,6 @@ class HTTP_Client
      * @param string $auth['Basic'|'Digest']
      * @param string $user
      * @param string $pass
-     *
      * @return void
      */
     public function setAuthMethod($auth, $user, $pass)
@@ -233,11 +209,12 @@ class HTTP_Client
      * 
      * @param string $key
      * @param string $val
-     *
      * @return void
      */
     public function setHeader($key, $val)
     {
+        $key = str_replace(array("\r\n","\r","\n"), '', $key);
+        $val = str_replace(array("\r\n","\r","\n"), '', $val);
         $this->_header[$key] = $val;
     }
 
@@ -426,7 +403,8 @@ class HTTP_Client
                                                      : '00000001';
 
         // A1
-        if ( $digest['algorithm'] == 'MD5' || empty($digest['algorithm'])  )
+        $A1 = null;
+        if ( $digest['algorithm'] == 'MD5' || empty($digest['algorithm']) )
         {
             $A1 =   md5(
                 $this->user.':'.
@@ -440,6 +418,7 @@ class HTTP_Client
         }
 
         // A2
+        $A2 = null;
         if ( $digest['qop'] == 'auth' || empty($digest['auth'])  )
         {
             $A2 =   md5(
@@ -453,6 +432,7 @@ class HTTP_Client
         }
 
         // D
+        $D = null;
         if ( empty($digest['qop']) )
         {
             $D  =   md5(
@@ -506,7 +486,6 @@ class HTTP_Client
      * _gzdecode
      *
      * @param string $data
-     *
      * @return string $decoded
      */
     private function _gzdecode($data)
@@ -529,7 +508,6 @@ class HTTP_Client
      *
      * @param string $str
      * @param string $eol
-     *
      * @return string $str
      */
     private function _chunkdecode ($str, $eol = "\r\n")
@@ -551,8 +529,6 @@ class HTTP_Client
 
         return $str;
     }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * getResponseStatus
@@ -593,14 +569,4 @@ class HTTP_Client
     {
         return $this->body;
     }
-
-    /**
-     * Exception Throw Methods : in the future...
-     */
-    /*
-    public function throw($msg)
-    {
-        throw new AhException_HTTP($msg);
-    }
-    */
 }
