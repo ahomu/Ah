@@ -238,8 +238,8 @@ function checkEncoding(&$key, &$val, $charset = 'UTF-8')
  */
 function escapeParameter(&$key, &$val, $charset = 'UTF-8')
 {
-    $key = htmlentities($key, ENT_QUOTES, $charset);
-    $val = htmlentities($val, ENT_QUOTES, $charset);
+    $key = htmlspecialchars($key, ENT_QUOTES, $charset);
+    $val = htmlspecialchars($val, ENT_QUOTES, $charset);
 }
 
 /**

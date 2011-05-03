@@ -7,6 +7,26 @@ use ah\event;
 /**
  * ah\Response
  *
+ * actionで扱われる，HTTPレスポンスの管理クラス．
+ *
+ * ah\action\Baseのコンストラクタ内で，
+ * Responseプロパティに，ah\Responseのインスタンスを割り当てられる．
+ * {{{
+ * $this->Response = new \ah\Response();
+ * }}}
+ *
+ * action内では，次のように使用される．
+ * {{{
+ * // MIMEタイプの指定
+ * $this->Response->setMimeType(\Util_MIME::detectType('html'));
+ *
+ * // ステータスコードの設定（デフォルトは200）
+ * $this->Response->setStatusCode(200);
+ *
+ * // レスポンスボディのセット
+ * $this->Response->setBody($response_string);
+ * }}}
+ *
  * @package     Ah
  * @copyright   2011 ayumusato.com
  * @license     MIT License
@@ -16,18 +36,75 @@ class Response
 {
     const HTTP_VERSION  = '1.1';
 
-    private
-        $_charset   = 'UTF-8',
-        $_mimetype  = 'text/html',
-        $_location  = null,
-        $_status    = '200',
-        $_body      = '',
-        $_cache     = '',
-        $_nocache   = false,
-        $_headers   = array();
+    /**
+     * ステータスコード
+     *
+     * @see ah\Response\setStatusCode()
+     * @see ah\Response\getStatusCode()
+     * @var int
+     */
+    private $_status    = 200;
 
     /**
-     * setStatusCode
+     * 文字コード
+     *
+     * @see ah\Response\setCharset()
+     * @var string
+     */
+    private $_charset   = 'UTF-8';
+
+    /**
+     * MIMEタイプ
+     *
+     * @see ah\Response\setMimeType()
+     * @var string
+     */
+    private $_mimetype  = 'text/html';
+
+    /**
+     * レスポンスボディ
+     *
+     * @see ah\Response\setBody()
+     * @see ah\Response\getBody()
+     * @see ah\Response\_sendNody()
+     * @var string
+     */
+    private $_body      = '';
+
+    /**
+     * リダイレクト先
+     *
+     * @see ah\Response\setLocation()
+     * @var string
+     */
+    private $_location  = null;
+
+    /**
+     * キャッシュコントロールの指定
+     *
+     * @see ah\Response\setCacheControl()
+     * @var string Cache-Control
+     */
+    private $_cache     = '';
+
+    /**
+     * キャッシュ無効フラグ
+     *
+     * @see ah\Response\setNoCache()
+     * @var bool
+     */
+    private $_nocache   = false;
+
+    /**
+     * レスポンスヘッダ
+     *
+     * @see ah\Response\setHeader()
+     * @see ah\Response\_sendHeader()
+     */
+    private $_headers   = array();
+
+    /**
+     * ステータスコード（3桁）を指定する．
      *
      * @param string $code
      * @return void
@@ -38,9 +115,9 @@ class Response
     }
 
     /**
-     * getStatusCode
+     * 現在のステータスコードを取得する．
      *
-     * @return string $code
+     * @return string
      */
     public function getStatusCode()
     {
@@ -48,7 +125,7 @@ class Response
     }
 
     /**
-     * setBody
+     * レスポンスボディを指定する．
      *
      * @param string $body
      * @return void
@@ -59,7 +136,7 @@ class Response
     }
 
     /**
-     * getBody
+     * 現在のレスポンスボディを取得する．
      *
      * @return string
      */
@@ -69,7 +146,7 @@ class Response
     }
 
     /**
-     * setCharset
+     * 文字コードを指定する．
      *
      * @param string $charset
      * @return void
@@ -80,7 +157,7 @@ class Response
     }
 
     /**
-     * setMimeType
+     * MIMEタイプを指定する．
      *
      * @param string $mimetype
      * @return void
@@ -91,7 +168,8 @@ class Response
     }
 
     /**
-     * setLocation
+     * Locationヘッダを指定する．リダイレクト用．
+     * 30x系のステータスコードと併用する．
      *
      * @param string $location
      * @return void
@@ -102,18 +180,21 @@ class Response
     }
 
     /**
-     * setNoCache
+     * キャッシュ無効の指定を行う．
+     * ここでtrueが指定された状態でレスポンスが返されると，
+     * Cache-Control: no-cache
      *
      * @param bool $bool
      * @return void
      */
-    public function setNoCache(boolean $bool)
+    public function setNoCache($bool)
     {
         $this->_nocache = $bool;
     }
 
     /**
-     * setCacheControl
+     * Cache-Controlを指定する．
+     * _nocacheプロパティがtrueの場合は，そちらが優先される．
      *
      * @param string $control
      * @return void
@@ -124,7 +205,7 @@ class Response
     }
 
     /**
-     * setHeader
+     * レスポンスヘッダーをkey-val式で指定する．
      *
      * @param string $key
      * @param string $val
@@ -136,8 +217,11 @@ class Response
     }
 
     /**
-     * sendHeader
+     * レスポンスヘッダーを全て送出する．
+     * PHP4.4.2および5.1.2以降で，header関数自体がヘッダインジェクション対策を持っている．
+     * http://php.net/manual/ja/function.header.php
      *
+     * @see ah\Response\send()
      * @return void
      */
     private function _sendHeader()
@@ -149,8 +233,9 @@ class Response
     }
 
     /**
-     * sendBody
+     * レスポンスボディを送出する．
      *
+     * @see ah\Response\send()
      * @return void
      */
     private function _sendBody()
@@ -159,7 +244,7 @@ class Response
     }
 
     /**
-     * send
+     * HTTPレスポンスをクライアントに返す
      *
      * @return void
      */
@@ -208,7 +293,12 @@ class Response
         event\Helper::getDispatcher()->notify(new event\Subject($this, 'response.send_after'));
     }
 
-    // status code list
+    /**
+     * ステータスコードと，メッセージの対応表
+     *
+     * @see ah\Response\send()
+     * @var array
+     */
     public static $statusCode = array(
         100 => 'Continue',
         101 => 'Switching Protocols',

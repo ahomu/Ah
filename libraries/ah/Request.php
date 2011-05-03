@@ -5,6 +5,10 @@ namespace ah;
 /**
  * ah\Request
  *
+ * クライアントからのHTTPリクエストに関する情報を取得する．
+ * staticメソッド群として実装．
+ * 各action間で共有しているグローバルなリクエスト情報．
+ *
  * @package     Ah
  * @copyright   2011 ayumusato.com
  * @license     MIT License

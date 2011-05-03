@@ -5,6 +5,23 @@ namespace ah;
 /**
  * ah\Validator
  *
+ * ah\Params内で利用されるバリデーションクラス．
+ *
+ * ah\action\Base::setParams()を通して，
+ * ah\Params::validate()から主に呼ばれる．
+ *
+ * 単体で利用する場合は次のようになる．
+ * {{{
+ * $Validator = new \ah\Validator();
+ * $Validator->validate($my_rule, $params);
+ *
+ * if ( $Validator->isValidAll() ) {
+ *     // OK
+ * } else {
+ *     // NG
+ * }
+ * }}}
+ *
  * @package     Ah
  * @copyright   2010 ayumusato.com
  * @license     MIT License
@@ -13,27 +30,40 @@ namespace ah;
 // TODO issue: ユーザー拡張のエンドポイントを考える
 class Validator
 {
-    private
-        $_temporary,
-        $_result;
+    /**
+     * validate実行時に与えられた，元のパラメーター．
+     * equalToなど，パラメーターを俯瞰する必要があるときにも利用される．
+     * @var array
+     */
+    private $_rawparams;
+    /**
+     * validate結果を納める先．
+     * $_result[パラメーターキー][バリデートメソッド][(bool)結果]
+     * @var array
+     */
+    private $_result;
 
     /**
-     * validate
+     * 与えられたパラメーターにバリデートルールを適用して，
+     * バリデート結果を保持した状態の自身のインスタンスを返す．
      *
+     * @see ah\Params::validate()
+     * @see ah\action\Base::setParams()
      * @param array $rule
      * @param array $params
      * @return Validator
      */
     public function validate($rule, $params)
     {
-        $this->_temporary = $params;
+        $this->_rawparams = $params;
         $result           = array();
 
-        foreach ( $this->_temporary as $param => $val ) {
+        foreach ( $this->_rawparams as $param => $val ) {
             // $param = paramator name
             // $val   = paramator value
 
-            if ( empty($rule[$param]) ) continue;
+            // ルールの指定がなければtrue
+            if ( empty($rule[$param]) ) $result[$param] = array(true);
 
             foreach ( $rule[$param] as $method => $args_or_method ) {
                 if ( is_int($method) ) { 
@@ -51,15 +81,16 @@ class Validator
     }
 
     /**
-     * isValid
+     * 指定されたキーのバリデート結果がvalidであればtrueを，
+     * そうでない，またはバリデートされていなければfalseを返す．
      *
+     * @see ah\Params::isValid()
      * @param string $key
      * @return boolean
      */
     public function isValid($key)
     {
-        // TODO exception: validation not yet
-        if ( empty($this->_result[$key]) ) return true;
+        if ( empty($this->_result[$key]) ) return false;
 
         if ( in_array(false, $this->_result[$key]) ) {
             return false;
@@ -68,14 +99,15 @@ class Validator
     }
 
     /**
-     * isValidAll
+     * バリデート結果がすべてvalidであればtrueを，
+     * そうでない，またはバリデート前であればfalseを返す
      *
+     * @see ah\Params::isValidAll()
      * @return boolean
      */
     public function isValidAll()
     {
-        // TODO exception: validation not yet
-        if ( empty($this->_result) ) return true;
+        if ( empty($this->_result) ) return false;
 
         foreach ( $this->_result as $row ) {
             if ( in_array(false, $row) ) {
@@ -86,7 +118,8 @@ class Validator
     }
 
     /**
-     * fire
+     * バリデートメソッドを起動して，結果を返す．
+     * requiredでなく，パラメーターがnullであればtrueとする．
      *
      * @param string $method
      * @param mixed $val
@@ -95,14 +128,20 @@ class Validator
      */
     public function fire($method, $val, $args)
     {
-        if ( $method !== 'required' && $val === null )
+        if ( $method !== 'required' && $val === null ) {
             return true;
+        }
 
-        if ( empty($args) )
+        // 引数なし
+        if ( empty($args) ) {
             return $this->$method($val);
+        }
 
-        if ( !is_array($args) ) $args = array($args);
-            return $this->$method($val, $args);
+        // 引数あり
+        if ( !is_array($args) ) {
+            $args = array($args);
+        }
+        return $this->$method($val, $args);
     }
 
     /**
@@ -110,8 +149,8 @@ class Validator
      *
      * @param mixed $val
      * @param args[0] string $differ
-     * @param args[1] boolean $strict
-     * @return boolean
+     * @param args[1] bool $strict
+     * @return bool
      */
     protected function equal($val, $args)
     {
@@ -131,19 +170,19 @@ class Validator
      *
      * @param mixed $val
      * @param args[0] string $to
-     * @param args[1] boolean $strict
-     * @return boolean
+     * @param args[1] bool $strict
+     * @return bool
      */
     protected function equalTo($val, $args)
     {
         // needle?
-        if ( empty($args[0]) || empty($this->_temporary[$args[0]]) ) return false;
+        if ( empty($args[0]) || empty($this->_rawparams[$args[0]]) ) return false;
 
         // strict?
         if ( !empty($args[1]) && $args[1] === true ) {
-            return ($val === $this->_temporary[$args[0]]);
+            return ($val === $this->_rawparams[$args[0]]);
         } else {
-            return ($val == $this->_temporary[$args[0]]);
+            return ($val == $this->_rawparams[$args[0]]);
         }
     }
 

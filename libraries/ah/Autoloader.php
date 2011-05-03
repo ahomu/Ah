@@ -7,6 +7,20 @@ use ah\exception;
 /**
  * ah\Autoloader
  *
+ * オートロードのサポートを行うクラス．
+ * 基本的には，ah(libraries/ah/)とapp(app/)の名前空間からのロードをサポートする．
+ *
+ * その他，PEARのような従来ライブラリにおけるFoo_Bar_Classのような命名規則は，
+ * libraries/commonと，app/common内でサポートする
+ *
+ * クラス名と，読み込まれるファイルの対応例：
+ * \app\action\Index    app/action/Index.php
+ * \ah\action\Base      libraries/ah/action/Base.php
+ * Foo_Bar_Class        libraries/common/foo/bar/Class.php または
+ *                      app/common/foo/bar/Class.php
+ *
+ * ※ symfony由来のクラスなどは，固有のルールで読み込まれる
+ *
  * @package     Ah
  * @copyright   2011 ayumusato.com
  * @license     MIT License
@@ -14,13 +28,15 @@ use ah\exception;
  */
 class Autoloader
 {
-    /**1
+    /**
      * オートローダーに処理を登録する．
      * 簡易的には，無名関数を渡してもよいし，従来通りの関数指定をしてもよい．
      *
+     * {{{
      * \ah\Autoloader::register(function($className) {
      *     // ロード処理
      * }, true);
+     * }}}
      *
      * @param callable $func
      * @param bool $throw
@@ -33,7 +49,6 @@ class Autoloader
 
     /**
      * ahのライブラリサポート範囲のオートロード処理を，プレフィックスで振り分ける
-     *
      *
      * @param string $className
      * @see ah\Autoloader::ahCoreLoad()

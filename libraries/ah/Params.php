@@ -5,6 +5,15 @@ namespace ah;
 /**
  * ah\Params
  *
+ * actionで扱われる，パラメーターの管理クラス．
+ *
+ * ah\action\Base::setParamsメソッドを実行すると，
+ * Paramsプロパティに，ah\PAramsのインスタンスを割り当てられる．
+ * {{{
+ * $this->Params = new \ah\Params($this->_receive_params, $params, $this->_default_charset);
+ * }}}
+ *
+ *
  * @package     Ah
  * @copyright   2011 ayumusato.com
  * @license     MIT License
@@ -12,18 +21,52 @@ namespace ah;
  */
 class Params
 {
-    private
-        $_allows,
-        $_params,
-        $_validator,
-        $_charset;
+    /**
+     * 受け取ってもよいパラメーターキーの配列
+     *
+     * @var array
+     */
+    private $_allows;
 
     /**
-     * __construct
+     * 実際に保持するパラメーターの連想配列
      *
+     * @var array hash
+     */
+    private $_params;
+
+    /**
+     * 処理済みのバリデーター
+     * ah\Params::valiate実行後に，処理済みのah\Validatorがセットされる．
+     *
+     * @see ah\Params\validate()
+     * @see ah\Params\isValid()
+     * @see ah\Params\isValidAll()
+     * @var object ah\Validator
+     */
+    private $_validator;
+
+    /**
+     * パラメーターの想定される文字コードの指定
+     *
+     * @var string
+     */
+    private $_charset;
+
+    /**
+     * コンストラクタ
+     *
+     * ah\action\Base::setParams()でParamsが初期化された時点で，
+     * 許可パラメーターの選別・文字コードのチェックが行われる.
+     * ※setParams内では，続けてバリデートも自動実行される．
+     *
+     * @todo 文字コードが不正だったときには，何らかの定数をセットするほうがよい
+     *
+     * @see ah\action\Base::setParams()
      * @param array $allows
      * @param array $params
      * @param null|string $charset
+     * @return void
      */
     public function __construct($allows, $params, $charset = null)
     {
@@ -43,7 +86,9 @@ class Params
     }
 
     /**
-     * set
+     * パラメーターの値を書き換える．
+     * 許可されているキーであれば，書き換えてtrueを返す．
+     * 許可されていないキーであれば，falseを返す．
      *
      * @param string $key
      * @param mixed $val
@@ -60,7 +105,12 @@ class Params
     }
 
     /**
-     * get
+     * パラメーターの値を取得する．
+     * 許可されていないキーであれば，falseを返す．
+     * rawパラメーターがtrueの場合は，そのままの値を返すが，
+     * 通常はhtmlspecialcharsをかけた状態にして値を返す．
+     *
+     * @todo TODO: 許可されていないキーへのアクセスは，falseでなく何らかの定数を返した方がよい
      *
      * @param string $key
      * @param bool $raw
@@ -71,13 +121,11 @@ class Params
         // undefined
         if ( !in_array($key, $this->_allows) ) return false;
 
-        // temporary
         $val = $this->_params[$key];
 
-        // raw value
         if ( $raw === true ) return $val;
 
-        // safety value
+        // escape
         if ( is_array($val) ) {
             $val = array_walk_recursive($val, 'escapeParameter', $this->_charset);
         } else {
@@ -88,8 +136,18 @@ class Params
     }
 
     /**
-     * validate
+     * パラメーターのバリデーション．
      *
+     * ah\action\Base::setParams()で，Paramsが初期化された後に，
+     * 自動でこのメソッドが実行される．
+     *
+     * 自動バリデート後に独自のルールで，バリデートを適用し直したいときは
+     * action内で次のように，validateメソッドを実行し直す．
+     * {{{
+     * $this->Params->validate($my_rules, new \ah\Validator());
+     * }}}
+     *
+     * @see ah\action\Base::setParams()
      * @param array $rule
      * @param Validator $Validator
      * @return void
@@ -100,7 +158,8 @@ class Params
     }
 
     /**
-     * isValidAll
+     * 直近のバリデート結果が，すべてvalidであればtrue，
+     * そうでなければfalseを返す．
      *
      * @return boolean
      */
@@ -110,7 +169,8 @@ class Params
     }
 
     /**
-     * isValid
+     * 指定したキーの直近のバリデート結果が，validであればtrue,
+     * そうでなければfalseを返す．
      *
      * @param string $key
      * @return boolean
@@ -121,7 +181,7 @@ class Params
     }
 
     /**
-     * toArray
+     * パラメーターを単純な連想配列として取得する．
      *
      * @return mixed array|null
      */
