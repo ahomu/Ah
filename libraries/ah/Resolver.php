@@ -147,6 +147,8 @@ class Resolver
      * resolver.action_before   : Actionを処理する直前（パラメーターセットと自動バリデートは終わっている）
      * resolver.action_after    : Actionを処理した直後
      *
+     * 例外発生時は，ah\action\Errorでレスポンスを処理する．
+     *
      * @param string $path
      * @param string $method
      * @param array $params
@@ -155,7 +157,6 @@ class Resolver
      */
     private static function _run($path, $method, $params, $final)
     {
-        // TODO task: 例外時の処理を外に出す
         try
         {
             $path   = preg_replace('/(\.'.Request::getExtension().')$/', '', $path);
@@ -186,49 +187,18 @@ class Resolver
 
             return $Action->$final();
         }
-        // TODO issue: Actionの外で投げられる例外のレスポンスボディのデフォルトを定義する(json or html or xmlなど)
-        // 各種エラー系ステータスコードのデフォルトテンプレートを各種の形式で用意（集積的なエラーレスポンスメソッド）
-        // エラーレスポンスメソッドは，Actionからも利用できるようにする
-        // 拡張子が自動決定される際は，Ah_Request::getExtension か Paramsのformatプロパティ が参照される
-        // internalのときはpath上の拡張子は利用できない（除去はされるが，Requestクラスに保存されないので，それ以後に参照しようがない）
-        // internalのときは，安易に例外を投げて内部的な404や405を返していいのか？
-        //     -> internalであっても404や405は開発者がつくってる最中に出くわす不注意によるエラーなので止めてok
-        catch ( \ah\exception\MethodNotAllowed $e )
-        {
-            $Res = new Response();
-            $Res->setStatusCode(405);
-            $Res->setHeader('Allow', $e->getMessage());
-            $Res->setBody(
-                 '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
-                .'<html><head>'
-                .'<title>405 Method Not Allowed</title>'
-                .'</head><body>'
-                .'<h1>Method Not Allowed</h1>'
-                .'<p>The requested Method '.$method.' was not allowed on this resource.</p>'
-                .'<p>( note : Allowed methods are "'.$e->getMessage().'". )</p>'
-                .'</body></html>'
-            );
-            $Res->send();
-        }
-        catch ( \ah\exception\NotFound $e )
-        {
-            $Res = new Response();
-            $Res->setStatusCode(404);
-            $Res->setBody(
-                 '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
-                .'<html><head>'
-                .'<title>404 Not Found</title>'
-                .'</head><body>'
-                .'<h1>Not Found</h1>'
-                .'<p>The requested URL '.$path.' was not found on this server.</p>'
-                .'<p>( note : "'.$e->getMessage().'" class file is missing. )</p>'
-                .'</body></html>'
-            );
-            $Res->send();
-        }
         catch ( \Exception $e )
         {
-            die('Unspecified Exception: '.$e->getMessage());
+            $Error = new action\Error();
+            $Error->setParams(array(
+                'exception' => $e,
+                'path'      => $path,
+                'method'    => $method,
+                'params'    => $params,
+                'final'     => $final
+            ));
+            $Error->execute('GET');
+            $Error->external();
         }
 
         return false;

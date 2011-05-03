@@ -63,7 +63,10 @@ class Validator
             // $val   = paramator value
 
             // ルールの指定がなければtrue
-            if ( empty($rule[$param]) ) $result[$param] = array(true);
+            if ( empty($rule[$param]) ) {
+                $result[$param] = array(true);
+                continue;
+            }
 
             foreach ( $rule[$param] as $method => $args_or_method ) {
                 if ( is_int($method) ) { 
