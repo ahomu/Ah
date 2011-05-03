@@ -8,13 +8,13 @@ AhはPHPのWebAPIフレームワークです．作っている最中です．
 +  CakePHPやSymfony，CodeIgniterなど世間のPHPフレームワークを使ったことがない
 +  フレームワークを理解したいなら，フレームワークを作って理解すればいいじゃない
 +  ひとつひとつのActionに，WebAPIのような振る舞いを強制する作法ってどうだろう
-+  究極的にはControllerやViewなんてフロントエンドのJSに託してしまってもいいんじゃ
++  ControllerやViewはフロントエンドのJSに託してしまってもいいんじゃないだろうか
 
 
 
 ##Actionの振る舞い
 
-+  明示的なConrollerを持たず，実行されるActionとURLが直結している
++  明示的なConrollerを持たず，実行されるActionとURLが直接対応している
 +  すべてのActionは，WebAPIのようにパスと引数を指定してアクセスできる
 +  すべてのActionは，リクエストメソッドによって異なった振る舞いを定義できる
 +  Actionへのリクエストは，内部と外部を問わず同様のインターフェースである
@@ -29,24 +29,24 @@ AhはPHPのWebAPIフレームワークです．作っている最中です．
 指定されたリクエストメソッドによって，Action内で実行されるメソッドが異なります．GETリクエストであればgetメソッドが，POSTリクエストであればpostメソッドがメインプロセスとして実行されます．
 
 GET /
-    Action_Index::get()
-    /app/action/Index.action.php
+    app\action\Index::get()
+    /app/action/Index.php
 
 GET /foo
-    Action_Foo::get()
-    /app/action/Foo.action.php
+    app\action\Foo::get()
+    /app/action/Foo.php
 
 POST /foo/bar
-    Action_Foo_Bar::post()
-    /app/action/Hoge/Fuga.action.php
+    action\foo\Bar::post()
+    /app/action/Foo/Bar.php
 
 
 
 ##Ah_ResolverによるActionの起動パターン
 
-Actionは，Ah_Resolverによって起動します．
+Actionは，ah\Resolverによって起動します．
 
-Ah_Resolverクラスはexternalとinternalとredirectというスタティックメソッドを持ちます．これらは，リクエストパスとメソッドを与えることで，パスに対するActionの解決と実行を行います．
+ah\Resolverクラスはexternalとinternalとredirectというスタティックメソッドを持ちます．これらは，リクエストパスとメソッドを与えることで，パスに対するActionの解決と実行を行います．
 
 ###externalメソッド
 通常は，Applicationクラスで一度だけ実行されます．Actionはoutputメソッドを起動し，HTTPレスポンスを返します
@@ -63,20 +63,20 @@ Ah_Resolverクラスはexternalとinternalとredirectというスタティック
 ###各メソッドの呼び出し例
 
 ####external
-    $path   = \Ah\Request::getPath();
-    $method = \Ah\Request::getMethod();
-    \Ah\Resolver::external($path, $method);
+    $path   = \ah\Request::getPath();
+    $method = \ah\Request::getMethod();
+    \ah\Resolver::external($path, $method);
 
 ####internal
-    \Ah\Resolver::internal('/hoge/fuga', 'POST');
-    Action_Hoge_Fuga::post()
+    \ah\Resolver::internal('/foo/bar', 'POST');
+    \app\action\foo\Bar::post()
 
 ####includes
-    \Ah\Resolver::includes('/hoge', 'GET');
-    Action_Hoge::get()
+    \ah\Resolver::includes('/hoge', 'GET');
+    \app\action\Hoge::get()
 
 ####redirect
-    \Ah\Resolver::redirect('http://example.com');
+    \ah\Resolver::redirect('http://example.com');
 
 
 
@@ -86,7 +86,9 @@ Ah_Resolverクラスはexternalとinternalとredirectというスタティック
 
     <?php
 
-    class Action_Index extends \Ah\Action\Abstract
+    namespace app\action;
+
+    class Index extends \ah\action\Base
     {
         protected
             // 引数として受け取れるパラメーターの定義
@@ -106,12 +108,12 @@ Ah_Resolverクラスはexternalとinternalとredirectというスタティック
              * サンプルリクエスト
              * GET /?hoge=fuga
              *
-             * + \Ah\Params $this->Params
-             * \Ah\Resolver::externalから呼ばれた場合はリクエストがGETであれば$_GETが，POSTであれば$_POSTが自動セットされる．
+             * + \ah\Params $this->Params
+             * \ah\Resolver::externalから呼ばれた場合はリクエストがGETであれば$_GETが，POSTであれば$_POSTが自動セットされる．
              * internalから呼ばれた場合は，第3引数に指定された連想配列が自動セットされる
              *
-             * + \Ah\Response $this->Response
-             * HTTPレスポンスを管理する．\Ah\Resolver::externalから呼ばれた場合はクライアントに返されるが，
+             * + \ah\Response $this->Response
+             * HTTPレスポンスを管理する．\ah\Resolver::externalから呼ばれた場合はクライアントに返されるが，
              * internalから呼ばれた場合は，レスポンスは実行されず，ActionインスタンスがResponseを内包したまま返される．
              *
              */
@@ -151,4 +153,4 @@ Ah_Resolverクラスはexternalとinternalとredirectというスタティック
           - order
 
 
-上記のサンプルでは，/foo/bar/1/close/recent というリクエストによってAction_Foo_Barが起動し，パラメーター配列はarray('id'=>1, 'status' => 'close', 'order' => 'recent')というように変換されてセットされます．
+上記のサンプルでは，/foo/bar/1/close/recent というリクエストによってapp\action\foo\Barが起動し，パラメーター配列はarray('id'=>1, 'status' => 'close', 'order' => 'recent')というように変換されてセットされます．

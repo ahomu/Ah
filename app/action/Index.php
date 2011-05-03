@@ -2,9 +2,7 @@
 
 namespace app\action;
 
-use ah\action\Base;
-
-class Index extends Base
+class Index extends \ah\action\Base
 {
     protected
         $_receive_params = array(
