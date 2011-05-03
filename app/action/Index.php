@@ -13,10 +13,10 @@ class Index extends \ah\action\Base
     public function get()
     {
         $root_vars = array(
-            'title' => 'Welcome to Ah Frameworks!',
+            'title' => 'Welcome to "Ah" WebAPI Framework',
         );
 
-        $View = new \ah\view\Template('index', 'html');
+        $View = new \ah\view\Template('index.html');
 
         $this->Response->setMimeType(\Util_MIME::detectType('html'));
         $this->Response->setStatusCode(200);

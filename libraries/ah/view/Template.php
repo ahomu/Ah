@@ -12,13 +12,10 @@ class Template extends Base
      * @param string $path
      * @param string $extension
      */
-    public function __construct($path = null, $extension = null)
+    public function __construct($path)
     {
-        if ( 1
-            and $path !== null
-            and $extension !== null
-        ) {
-            $this->setTpl($path, $extension);
+        if (!empty($path) ) {
+            $this->setTpl($path);
         }
         return parent::__construct();
     }
@@ -27,18 +24,16 @@ class Template extends Base
      * setTpl
      *
      * @param string $path
-     * @param string $extension
      * @return void
      */
-    public function setTpl($path, $extension)
+    public function setTpl($path)
     {
-        $tplPath = implode('/', array_merge(explode('/', DIR_TPL), explode('/', $path))).".$extension";
+        $tplPath = implode('/', array_merge(explode('/', DIR_TPL), explode('/', $path)));
 
         if ( is_readable($tplPath) ) {
             $tpl = file_get_contents($tplPath);
             $this->tpl = new \Template($tpl);
         } else {
-            // TODO exception: template file is not found
             $this->tpl = null;
         }
     }

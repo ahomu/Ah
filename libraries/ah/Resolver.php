@@ -164,6 +164,10 @@ class Resolver
             $final  = substr($final, (strpos($final, '::')+2));
             $Action = self::_actionDispatcher($path);
 
+            if ( !$Action instanceof \ah\action\Base ) {
+                throw new ExtendsRequired('Calling '.$Action.' class does not extend \ah\action\Base.');
+            }
+
             $allowed = $Action->methodIsExists($method);
             if ( $allowed !== true ) {
                 throw new MethodNotAllowed(strtoupper(implode(', ', $allowed)));
@@ -171,10 +175,6 @@ class Resolver
 
             if ( !$Action->finalyIsAllowed($final) ) {
                 throw new ExecuteNotAllowed($final.' call not allowed');
-            }
-
-            if ( !$Action instanceof \ah\action\Base ) {
-                throw new ExtendsRequired('Calling '.$Action.' class does not extend \ah\action\Base.');
             }
 
             $Action->setParams($params);
