@@ -1,6 +1,6 @@
 <?php
 
-namespace action;
+namespace app\action;
 
 use ah\action\Base;
 

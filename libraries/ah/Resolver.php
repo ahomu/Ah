@@ -188,7 +188,7 @@ class Resolver
         if ( $path === '/' ) $path = '/index';
 
         $stacks = array_clean(explode('/', strtolower($path)));
-        array_unshift($stacks, 'action');
+        array_unshift($stacks, '\app\action');
         array_splice($stacks, -1, 1, ucfirst(end($stacks)));
 
         $actionName = implode('\\', $stacks);

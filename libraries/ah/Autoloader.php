@@ -14,10 +14,15 @@ use ah\exception;
  */
 class Autoloader
 {
-    /**
-     * register
+    /**1
+     * オートローダーに処理を登録する．
+     * 簡易的には，無名関数を渡してもよいし，従来通りの関数指定をしてもよい．
      *
-     * @param function $func
+     * \ah\Autoloader::register(function($className) {
+     *     // ロード処理
+     * }, true);
+     *
+     * @param callable $func
      * @param bool $throw
      * @return void
      */
@@ -27,48 +32,48 @@ class Autoloader
     }
 
     /**
-     * ahLoad
+     * ahのライブラリサポート範囲のオートロード処理を，プレフィックスで振り分ける
+     *
      *
      * @param string $className
+     * @see ah\Autoloader::ahCoreLoad()
+     * @see ah\Autoloader::ahAppLoad()
+     * @see ah\Autoloader::ahCommonLoad()
      * @return void
      */
     public function ahLoad($className)
     {
-        if ( strpos($className, '\\') !== false ) {
-            $separator = '\\';
-        } else {
-            $separator = '_';
-        }
-
-        $package = $this->_getPackage($className, $separator);
+        $package = $this->_getNamespace($className);
 
         switch ($package) {
             case 'ah'       :
-                $this->ahCoreLoad($className, $separator);
+                $this->ahCoreLoad($className);
                 break;
-            case 'action'   :
-                $this->ahActionLoad($className, $separator);
+            case 'app'   :
+                $this->ahAppLoad($className);
                 break;
             default         :
-                $this->ahCommonLoad($className, $separator);
+                $this->ahCommonLoad($className);
                 break;
         }
 
     }
 
     /**
-     * ahActionLoad
+     * appディレクトリからロードする．名前空間を使用する必要がある．
+     * 名前空間を使わない旧来のライブラリを共存させる場合は，commonディレクトリを利用する．
      *
      * @param string $className
      * @return void
      */
-    public function ahActionLoad($className)
+    public function ahAppLoad($className)
     {
+        $className = substr($className, strlen('app\\'));
         $this->_traversal(DIR_APP, $className);
     }
 
     /**
-     * ahCoreLoad
+     * libraries/ahディレクトリからロードする．
      *
      * @param string $className
      * @return void
@@ -79,7 +84,8 @@ class Autoloader
     }
 
     /**
-     * ahCommonLoad
+     * 従来の命名規則のクラス（たとえばFoo_Bar_Class）を，commonディレクトリからロードする．
+     * librariesとappのそれぞれのcommonディレクトリに対して試行する
      *
      * @param string $className
      * @return void
@@ -87,10 +93,11 @@ class Autoloader
     public function ahCommonLoad($className)
     {
         $this->_traversal(DIR_LIB.'/common', $className);
+        $this->_traversal(DIR_APP.'/common', $className);
     }
 
     /**
-     * sfLoad
+     * Symfony由来のライブラリをロードする
      *
      * @param string $className
      * @return void
@@ -102,19 +109,31 @@ class Autoloader
     }
 
     /**
-     * _getPackage
+     * クラス名の先頭からルートの名前空間に相当する部分を取得する．
      *
      * @param string $className
-     * @param string $needle
      * @return string
      */
-    private function _getPackage($className, $needle)
+    private function _getNamespace($className)
     {
-        return substr($className, 0, strpos($className, $needle));
+        $separator = $this->_getSeparator($className);
+
+        return substr($className, 0, strpos($className, $separator));
     }
 
     /**
-     * _traversal
+     * クラス名のセパレータを取得する．
+     *
+     * @param string $className
+     * @return string
+     */
+    private function _getSeparator($className)
+    {
+        return strpos($className, '\\') !== false ? '\\' : '_';
+    }
+
+    /**
+     * 探索元のベースパスとクラス名を元にファイルパスを生成し，ロードを試みる．
      *
      * @param string $basepath
      * @param string $className
@@ -122,22 +141,17 @@ class Autoloader
      */
     private function _traversal($basepath, $className)
     {
-        if ( strpos($className, '\\') !== false ) {
-            $separator = '\\';
-        } else {
-            $separator = '_';
-        }
+        $separator = $this->_getSeparator($className);
 
         $pathStack = explode($separator, $className);
         array_unshift($pathStack, $basepath);
 
         $filePath  = implode('/', $pathStack).'.php';
-
         $this->_load($filePath);
     }
 
     /**
-     * _load
+     * 渡されたファイルパスが，読み込み可能な状態であれば，require_onceする．
      *
      * @param string $filePath
      * @return void
@@ -150,9 +164,8 @@ class Autoloader
     }
 
     /**
-     * terminate
+     * すべてのオートロード処理に失敗した場合に，例外を投げる．
      *
-     * @throws Ah_Exception_NotFound
      * @param string $className
      * @return void
      */
