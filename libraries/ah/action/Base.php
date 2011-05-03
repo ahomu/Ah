@@ -4,12 +4,15 @@ namespace ah\action;
 
 use ah\Params,
     ah\Response,
-    ah\Validator,
-    ah\exception\MethodNotAllowed,
-    ah\exception\ExecuteNotAllowed;
+    ah\Validator;
 
 /**
  * ah\action\Base
+ *
+ * Actionのベースクラス．
+ * すべてのActionは，何らかの形でこのクラスを継承している必要がある．
+ *
+ * 主にah\Resolverと，Actionのコミュニケーションが実装されている．
  *
  * @package     Ah
  * @subpackage  Action
@@ -22,29 +25,53 @@ abstract class Base implements Mold
     // TODO issue: メソッドごとにparamsとruleを設定できないのを解決する
 
     /**
-     * protected properties
-     *
-     * @var Ah_Param    $Params
-     * @var Ah_Response $Response
-     * @var boolean     $_allow_external
-     * @var boolean     $_allow_internal
-     * @var boolean     $_allow_includes
-     * @var array       $_receive_params
-     * @var array       $_validate_rule
-     * @var string      $_default_charset
+     * Actionのパラメーターを保持する
+     * @var object ah\Params
      */
-    protected
-        $Params             = null,
-        $Response           = null,
-        $_allow_external    = true,
-        $_allow_internal    = true,
-        $_allow_includes    = true,
-        $_receive_params    = array(),
-        $_validate_rule     = array(),
-        $_default_charset   = null;
+    protected $Params             = null;
 
     /**
-     * __construct
+     * Actionのレスポンスを保持する
+     * @var object ah\Response
+     */
+    protected $Response           = null;
+
+    /**
+     * 各種の最終処理の実行を許可するかどうかの真偽値．
+     * falseの場合，最終実行時に例外が投げられる
+     *
+     * @see ah\action\Base::output()
+     * @see ah\action\Base::passing()
+     * @see ah\action\Base::printing()
+     * @var bool
+     */
+    protected $_allow_external    = true;
+    protected $_allow_internal    = true;
+    protected $_allow_includes    = true;
+
+    /**
+     * 許可パラメーターのキー名を保持する配列
+     * @var array
+     */
+    protected $_receive_params    = array();
+
+    /**
+     * Params初期化時の自動バリデートに利用される，バリデートルール．
+     * $_validate_rule[パラメーターキー][バリデートメソッド][バリデート引数]
+     * @var array
+     */
+    protected $_validate_rule     = array();
+
+    /**
+     * Actionの想定される取り扱い文字コード
+     * @var string
+     */
+    protected $_default_charset   = 'UTF-8';
+
+    /**
+     * コンストラクタ
+     *
+     * Responseを初期化する．
      *
      * @return void
      */
@@ -54,7 +81,18 @@ abstract class Base implements Mold
     }
 
     /**
-     * setParams
+     * Actionクラス名を返す
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return __CLASS__;
+    }
+
+    /**
+     * 与えられたパラメーターと，自身の$_receive_paramsを元に，Paramsを初期化する．
+     * 同時に，自身の$_validate_ruleを元に，パラメーターのバリデートを行う．
      *
      * @param array $params
      * @return void
@@ -65,18 +103,78 @@ abstract class Base implements Mold
 
         /**
          * 自動validate
-         * 手動の時は，$this->Params->validate($myRules, new Validator()) としてActionのメインロジック内で実行する
+         * 手動の時は，$this->Params->validate($my_rules, new Validator()) としてActionのメインロジック内で実行する
          */
         $this->Params->validate($this->_validate_rule, new Validator());
     }
 
     /**
-     * execute
+     * Actionのメイン処理の起動．
+     * 指定されたリクエストメソッドと，実際のActionに定義されたメソッドが対応する．
+     * 存在しないメソッドがリクエストされた場合は例外 ( 405 Method Not Allowed ) を投げる．
      *
      * @param string $method
      * @return void
      */
     public function execute($method)
+    {
+        $this->$method();
+    }
+
+    /**
+     * HTTPレスポンスを送信するActionの最終処理
+     *
+     * @see ah\Resolver::external()
+     * @return void ( send http response )
+     */
+    public function external()
+    {
+        $this->Response->send();
+    }
+
+    /**
+     * 自身のインスタンスを返すActionの最終処理
+     *
+     * @see ah\Resolver::internal()
+     * @return object $this
+     */
+    public function internal()
+    {
+        return $this;
+    }
+
+    /**
+     * レスポンスボディのみを返すActionの最終処理
+     *
+     * @see ah\Resolver::includes()
+     * @return string $responseBody
+     */
+    public function includes()
+    {
+        return $this->Response->getBody();
+    }
+
+    /**
+     * 指定された最終処理の実行が許可されているか調べる．
+     * 許可フラグになっているプロパティの真偽値を直接返す
+     *
+     * @param string $final
+     * @return bool
+     */
+    public function finalyIsAllowed($final)
+    {
+        $property = '_allow_'.$final;
+        return $this->$property;
+    }
+
+    /**
+     * 指定されたメソッドが存在するか調べる．
+     * 存在すればtrueを返し，存在しなければ実行可能な存在するメソッドを配列で返す．
+     *
+     * @param string $method
+     * @return array|bool
+     */
+    public function methodIsExists($method)
     {
         if ( !method_exists($this, $method) ) {
             $methods = get_class_methods($this);
@@ -87,45 +185,8 @@ abstract class Base implements Mold
             if ( in_array('put', $methods) ) $allows[]      = 'put';
             if ( in_array('delete', $methods) ) $allows[]   = 'delete';
 
-            throw new MethodNotAllowed(strtoupper(implode(', ', $allows)));
+            return $allows;
         }
-
-        $this->$method();
-    }
-
-    /**
-     * output ( call from Ah_Resolver::external )
-     *
-     * @return void ( send http response )
-     */
-    public function output()
-    {
-        if ( $this->_allow_external === false ) throw new ExecuteNotAllowed('External call not allowed');
-
-        $this->Response->send();
-    }
-
-    /**
-     * passing ( call from Ah_Resolver::internal )
-     *
-     * @return object $this
-     */
-    public function passing()
-    {
-        if ( $this->_allow_internal === false ) throw new ExecuteNotAllowed('Internal call not allowed');
-
-        return $this;
-    }
-
-    /**
-     * printing ( call from Ah_Resolver::includes )
-     *
-     * @return string $responseBody
-     */
-    public function printing()
-    {
-        if ( $this->_allow_includes === false ) throw new ExecuteNotAllowed('Includes call not allowed');
-
-        return $this->Response->getBody();
+        return true;
     }
 }

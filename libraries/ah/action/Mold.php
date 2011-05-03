@@ -17,9 +17,13 @@ interface Mold
 
     public function execute($method);
 
-    public function output();
+    public function external();
 
-    public function passing();
+    public function internal();
 
-    public function printing();
+    public function includes();
+
+    public function finalyIsAllowed($final);
+
+    public function methodIsExists($method);
 }

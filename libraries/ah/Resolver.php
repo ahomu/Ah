@@ -3,10 +3,45 @@
 namespace ah;
 
 use ah\event,
-    ah\exception\ExtendsRequired;
+    ah\exception\ExtendsRequired,
+    ah\exception\MethodNotAllowed,
+    ah\exception\ExecuteNotAllowed;
 
 /**
  * ah\Resolver
+ *
+ * 各publicメソッドに，リクエストパスとメソッドを与えると，実行すべきActionの探索と実行を行い，
+ * HTTPレスポンス・Action自身のインスタンス・Actionのレスポンスボディのいずれかを返す．
+ *
+ * ah\Resolver::external()は，Actionを解決して，HTTPレスポンスの返却までを行う．
+ * {{{
+ * // ah\Requestはクライアントからのリクエスト情報を持つ
+ * \ah\Resolver::external(\ah\Request::getPath(), \ah\Request::getMethod());
+ * }}}
+ *
+ * ah\Resolver::internal()は，Actionを解決して，処理済みのActionインスタンスを返す．
+ * {{{
+ * $prams = array(
+ *     'foo'  => 'bar',
+ *     'hoge' => 'fuga'
+ * );
+ * $Action = \ah\Resolver::internal('/foo/bar/class', 'GET', $params);
+ * }}}
+ *
+ * ah\Resolver::includes()は，Actionを解決して，Actionの持つレスポンスボディのみを返す．
+ * {{{
+ * $responsBody = \ah\Resolver::includes('/foo/bar/class', 'GET');
+ * }}}
+ *
+ * ah\Resolver::redirect()は，Actionの解決ではなく，303 See Otherリダイレクトを行う．
+ * {{{
+ * $prams = array(
+ *     'foo'  => 'bar',
+ *     'hoge' => 'fuga'
+ * );
+ * // http://example.com/?foo=bar&hoge=fuga にリダイレクトする
+ * \ah\Resolver::redirect('http://example.com/', $params);
+ * }}}
  *
  * @package     Ah
  * @copyright   2011 ayumusato.com
@@ -16,7 +51,8 @@ use ah\event,
 class Resolver
 {
     /**
-     * external - external action and send response
+     * Actionを解決して，HTTPレスポンスをクライアントに送出する．
+     * 引数マップを参照した結果，パラメーターが得られなければGETやPOSTを参照する．
      *
      * @param  string $path
      * @param  string $method
@@ -32,11 +68,12 @@ class Resolver
             $params = Request::getParams($method);
         }
 
-        return self::_run($path, $method, $params, 'output');
+        return self::_run($path, $method, $params, __METHOD__);
     }
 
     /**
-     * internal - internal action and get executed action instance
+     * Actionを解決して，処理済みのActionインスタンスを返す．
+     * パラメーターが空のときのみ，引数マップを参照する．
      *
      * @param  string $path
      * @param  string $method
@@ -49,11 +86,12 @@ class Resolver
         if ( empty($params) ) {
             $params = self::_argumentsMapper($path, $method);
         }
-        return self::_run($path, $method, $params, 'passing');
+        return self::_run($path, $method, $params, __METHOD__);
     }
 
     /**
-     * includes - internal action and get response body
+     * Actionを解決して，処理済みのActionのレスポンスボディを返す．
+     * パラメーターが空のときのみ，引数マップを参照する．
      *
      * @param  string $path
      * @param  string $method
@@ -66,11 +104,12 @@ class Resolver
         if ( empty($params) ) {
             $params = self::_argumentsMapper($path, $method);
         }
-        return self::_run($path, $method, $params, 'includes');
+        return self::_run($path, $method, $params, __METHOD__);
     }
 
     /**
-     * redirect - goto uri
+     * 指定されたURLにリダイレクト（303 See Other）する．
+     * パラメーターが指定された場合は，GETクエリーとしてURLに付与される．
      *
      * @param  string $path path or url
      * @param  array $params GET only
@@ -93,7 +132,20 @@ class Resolver
     }
 
     /**
-     * _run - run action
+     * Actionを処理するメインロジック．
+     *
+     * 次の順番で，Actionの解決が行われる．
+     * 1. Actionの呼び出しと生成
+     * 2. 指定された最終処理が許可されているか
+     * 3. 指定されたメソッドが存在するか
+     * 4. \ah\action\Baseを継承・実装しているか
+     * 5. パラメーターのセット
+     * 6. Actionのメイン処理の実行
+     * 7. Actionの最終処理の実行
+     *
+     * この処理の最中，次のイベントが配信される．
+     * resolver.action_before   : Actionを処理する直前（パラメーターセットと自動バリデートは終わっている）
+     * resolver.action_after    : Actionを処理した直後
      *
      * @param string $path
      * @param string $method
@@ -106,25 +158,30 @@ class Resolver
         // TODO task: 例外時の処理を外に出す
         try
         {
-            // resolve variables
-            $method = strtolower($method);
-
-            // remove extension
             $path   = preg_replace('/(\.'.Request::getExtension().')$/', '', $path);
-
-            // dispatch Action
+            $method = strtolower($method);
+            $final  = substr($final, (strpos($final, '::')+2));
             $Action = self::_actionDispatcher($path);
 
-            // set params
+            $allowed = $Action->methodIsExists($method);
+            if ( $allowed !== true ) {
+                throw new MethodNotAllowed(strtoupper(implode(', ', $allowed)));
+            }
+
+            if ( !$Action->finalyIsAllowed($final) ) {
+                throw new ExecuteNotAllowed($final.' call not allowed');
+            }
+
+            if ( !$Action instanceof \ah\action\Base ) {
+                throw new ExtendsRequired('Calling '.$Action.' class does not extend \ah\action\Base.');
+            }
+
             $Action->setParams($params);
 
-            // #EVENT action before
             event\Helper::getDispatcher()->notify(new event\Subject($Action, 'resolver.action_before'));
 
-            // action execute
             $Action->execute($method);
 
-            // #EVENT action after
             event\Helper::getDispatcher()->notify(new event\Subject($Action, 'resolver.action_after'));
 
             return $Action->$final();
@@ -178,7 +235,7 @@ class Resolver
     }
 
     /**
-     * _actionDispatcher
+     * 与えられたパスから，起動するアクションのパスを組み立ててインスタンスを返す．
      *
      * @param  $path
      * @return object $Action
@@ -195,15 +252,15 @@ class Resolver
 
         $Action = new $actionName();
 
-        if ( !$Action instanceof \ah\action\Base ) {
-            throw new ExtendsRequired('Calling '.$actionName.' class does not extend \ah\action\Base.');
-        }
-
         return $Action;
     }
 
     /**
-     * _argumentsMapper
+     * 設定ファイルから，パスに含まれる引数マップを解決して，
+     * パラメーターを連想配列で返す．
+     *
+     * 単純に前方一致で判定を行っているので，引数部分はパスの後方に寄らなければならない．
+     * 引数マップが解決された場合，元のパスは引数部分を除いた状態に書き換えられる．
      *
      * @param string $rawPath
      * @param string $method
