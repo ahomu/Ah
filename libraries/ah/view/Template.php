@@ -2,8 +2,18 @@
 
 namespace ah\view;
 
+/**
+ * Template
+ *
+ * Templateクラスを元にしたViewクラス．
+ * テンプレートエンジンのラッパメソッドです．
+ */
 class Template extends Base
 {
+    /**
+     * Templateインスタンス
+     * @var object \Template
+     */
     private $tpl;
 
     /**
@@ -11,6 +21,7 @@ class Template extends Base
      *
      * @param string $path
      * @param string $extension
+     * @return void
      */
     public function __construct($path)
     {

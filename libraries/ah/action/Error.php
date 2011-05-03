@@ -48,6 +48,26 @@ class Error extends Base
                 .'<p>( note : Allowed methods are "'.$e->getMessage().'". )</p>'
                 .'</body></html>'
             );
+        } elseif ( $e instanceof \ah\exception\ExecuteNotAllowed ) {
+            $this->Response->setStatusCode(503);
+            $this->Response->setBody(
+                '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
+               .'<html><head>'
+               .'<title>503 Service Unavailable</title>'
+               .'</head><body>'
+               .'<h1>Service Unavailable</h1>'
+               .'</body></html>'
+            );
+        } elseif ( $e instanceof \ah\exception\ExtendsRequired ) {
+            $this->Response->setStatusCode(503);
+            $this->Response->setBody(
+                '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
+               .'<html><head>'
+               .'<title>503 Service Unavailable</title>'
+               .'</head><body>'
+               .'<h1>Service Unavailable</h1>'
+               .'</body></html>'
+            );
         } else {
             die($e->getMessage());
         }
