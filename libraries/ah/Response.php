@@ -224,8 +224,14 @@ class Response
      * @see ah\Response\send()
      * @return void
      */
-    private function _sendHeader()
+    private function _sendHeaders()
     {
+        header(sprintf('HTTP/%s %s %s',
+                       self::HTTP_VERSION,
+                       $this->_status,
+                       self::$statusCode[$this->_status]
+        ));
+
         foreach ( $this->_headers as $key => $val ) {
             $header = $key.': '.$val;
             header($header);
@@ -250,14 +256,7 @@ class Response
      */
     public function send()
     {
-        // status line
-        header(sprintf('HTTP/%s %s %s',
-                       self::HTTP_VERSION,
-                       $this->_status,
-                       self::$statusCode[$this->_status]
-        ));
-
-        // send response headers
+        // fix response headers
         if ( $this->_nocache === true ) {
             // no nocache
             $this->setHeader('Cache-Control', 'no-cache');
@@ -283,8 +282,10 @@ class Response
         // #EVENT send before
         event\Helper::getDispatcher()->notify(new event\Subject($this, 'response.send_before'));
 
-        // send response header
-        $this->_sendHeader();
+        // send response header ( テスト時は動作させない )
+        if ( isset($_SERVER['APPLICATION_ENV']) && $_SERVER['APPLICATION_ENV'] !== 'unittest' ) {
+            $this->_sendHeaders();
+        }
 
         // send response body
         $this->_sendBody();
