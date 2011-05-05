@@ -153,7 +153,7 @@ class Resolver
      * @param string $method
      * @param array $params
      * @param string $final
-     * @return object|bool
+     * @return object
      */
     private static function _run($path, $method, $params, $final)
     {
@@ -198,10 +198,8 @@ class Resolver
                 'final'     => $final
             ));
             $Error->execute('GET');
-            $Error->external();
+            return $Error->external();
         }
-
-        return false;
     }
 
     /**
@@ -239,32 +237,33 @@ class Resolver
     private static function _argumentsMapper(& $rawPath, $method)
     {
         $map = Config::load('map', 'arguments_mapper');
-        if ( empty($map[$method]) ) return array();
 
-        foreach ( $map[$method] as $path => $args ) {
-            // 前方一致によって判定を行う
-            if ( strpos($rawPath, $path) === 0 ) {
-                $chunks = explode('/', substr($rawPath, strlen($path)));
+        if ( !empty($map[$method]) ) {
+            foreach ( $map[$method] as $path => $args ) {
+                // 前方一致によって判定を行う
+                if ( strpos($rawPath, $path) === 0 ) {
+                    $chunks = explode('/', substr($rawPath, strlen($path)));
 
-                // remove blank
-                $chunks = array_clean($chunks);
+                    // remove blank
+                    $chunks = array_clean($chunks);
 
-                // adjust smaller length
-                $count  = min(array(count($args), count($chunks)));
+                    // adjust smaller length
+                    $count  = min(array(count($args), count($chunks)));
 
-                // key
-                $args   = array_slice($args, 0, $count);
+                    // key
+                    $args   = array_slice($args, 0, $count);
 
-                // value
-                $chunks = array_slice($chunks, 0, $count);
+                    // value
+                    $chunks = array_slice($chunks, 0, $count);
 
-                if ( empty($args) || empty($chunks) ) return array();
+                    if ( empty($args) || empty($chunks) ) return array();
 
-                // 元のパスを書き換える
-                $rawPath = $path;
+                    // 元のパスを書き換える
+                    $rawPath = $path;
 
-                // 切り出したパラメーターを返す
-                return array_combine($args, $chunks);
+                    // 切り出したパラメーターを返す
+                    return array_combine($args, $chunks);
+                }
             }
         }
         return array();

@@ -1,22 +1,23 @@
 <?php
 
+namespace ah\debug;
+
 /**
- * Ah_Debug_Timer
+ * ah\debug\Timer
  *
  * @package     Ah
  * @subpackage  Debug
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
  */
-class Ah_Debug_Timer
+class Timer
 {
     private static $INSTANCE;
 
     var $start;
     var $end;
     var $time;
-    var $mem;
     var $usage;
 
     public static function getInstance()
@@ -35,7 +36,6 @@ class Ah_Debug_Timer
     public function start()
     {
         $this->start    = $this->_now();
-        $this->mem      = memory_get_usage();
         return $this;
     }
     
@@ -43,7 +43,6 @@ class Ah_Debug_Timer
     {
         $this->end      = $this->_now();
         $this->time     = round(($this->end - $this->start), 5);
-        $this->usage    = memory_get_usage() - $this->mem;
         return $this;
     }
 

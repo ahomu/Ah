@@ -26,15 +26,17 @@ abstract class Base implements Mold
 
     /**
      * Actionのパラメーターを保持する
+     * @see ah\Params
      * @var object ah\Params
      */
-    protected $Params             = null;
+    public $Params             = null;
 
     /**
      * Actionのレスポンスを保持する
+     * @see ah\Response
      * @var object ah\Response
      */
-    protected $Response           = null;
+    public $Response           = null;
 
     /**
      * 各種の最終処理の実行を許可するかどうかの真偽値．
@@ -87,7 +89,7 @@ abstract class Base implements Mold
      */
     public function __toString()
     {
-        return __CLASS__;
+        return get_class($this);
     }
 
     /**
@@ -125,11 +127,12 @@ abstract class Base implements Mold
      * HTTPレスポンスを送信するActionの最終処理
      *
      * @see ah\Resolver::external()
-     * @return void ( send http response )
+     * @return object $this ( & send http response )
      */
     public function external()
     {
         $this->Response->send();
+        return $this;
     }
 
     /**

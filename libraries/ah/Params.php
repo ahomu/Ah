@@ -13,7 +13,6 @@ namespace ah;
  * $this->Params = new \ah\Params($this->_receive_params, $params, $this->_default_charset);
  * }}}
  *
- *
  * @package     Ah
  * @copyright   2011 ayumusato.com
  * @license     MIT License
@@ -39,6 +38,7 @@ class Params
      * 処理済みのバリデーター
      * ah\Params::valiate実行後に，処理済みのah\Validatorがセットされる．
      *
+     * @see ah\Validator
      * @see ah\Params\validate()
      * @see ah\Params\isValid()
      * @see ah\Params\isValidAll()

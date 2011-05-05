@@ -28,19 +28,21 @@ class Cache
 
     public static function load($realPath, $ns = null)
     {
-        return file_get_contents(self::_getPath($realPath, $ns));
+        file_get_contents(self::_getPath($realPath, $ns));
     }
 
     public static function save($realPath, $content, $ns = null)
     {
         $cachePath = self::_getPath($realPath, $ns);
 
-        $dirPath   = preg_replace('/(\/\w+)$/', '', $cachePath);
-        if ( !file_exists($dirPath) ) {
+        $dirPath   = dirname($cachePath);
+        if ( !file_exists($dirPath) && is_writable($dirPath) ) {
             mkdir($dirPath);
         }
 
-        return file_put_contents($cachePath, $content);
+        if ( is_writable($cachePath) ) {
+            file_put_contents($cachePath, $content);
+        }
     }
 
     private static function _getPath($realPath, $ns = null)

@@ -30,8 +30,7 @@ class Config
                 self::$RAM[$key] = unserialize(Cache::load($ymlPath, 'config'));
             } else {
                 self::$RAM[$key] = \Spyc::YAMLLoad($ymlPath);
-                if ( !empty(self::$RAM[$key]) )
-                {
+                if ( !empty(self::$RAM[$key]) ) {
                     Cache::save($ymlPath, serialize(self::$RAM[$key]), 'config');
                 }
             }
