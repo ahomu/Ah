@@ -23,7 +23,9 @@ class Request
      */
     public static function getHost()
     {
-        return isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
+        return isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST']
+                                                        : (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST']
+                                                                                        : '');
     }
 
     /**
@@ -71,7 +73,7 @@ class Request
 
         if ( strpos($request_uri, $script_name) === 0 ) {
             return $script_name;
-        } elseif ( strpos($request_uri, dirname($script_name)) ) {
+        } elseif ( strpos($request_uri, dirname($script_name)) === 0 ) {
             return rtrim(dirname($script_name), '/');
         }
 
@@ -108,14 +110,14 @@ class Request
     /**
      * リクエスト中の拡張子を取得する．
      *
-     * @return null|string
+     * @return string
      */
     public static function getExtension()
     {
         if ( preg_match('@\.(\w+)$@', self::getPath(), $match) ) {
             return strval($match[1]);
         }
-        return null;
+        return '';
     }
 
     /**

@@ -54,24 +54,20 @@ class Autoloader
      * @see ah\Autoloader::ahCoreLoad()
      * @see ah\Autoloader::ahAppLoad()
      * @see ah\Autoloader::ahCommonLoad()
-     * @return void
+     * @return bool
      */
     public function ahLoad($className)
     {
         $package = $this->_getNamespace($className);
 
         switch ($package) {
-            case 'ah'       :
-                $this->ahCoreLoad($className);
-                break;
-            case 'app'   :
-                $this->ahAppLoad($className);
-                break;
-            default         :
-                $this->ahCommonLoad($className);
-                break;
+            case 'ah'   :
+                return $this->ahCoreLoad($className);
+            case 'app'  :
+                return $this->ahAppLoad($className);
+            default     :
+                return $this->ahCommonLoad($className);
         }
-
     }
 
     /**
@@ -79,23 +75,23 @@ class Autoloader
      * 名前空間を使わない旧来のライブラリを共存させる場合は，commonディレクトリを利用する．
      *
      * @param string $className
-     * @return void
+     * @return bool
      */
     public function ahAppLoad($className)
     {
         $className = substr($className, strlen('app\\'));
-        $this->_traversal(DIR_APP, $className);
+        return $this->_traversal(DIR_APP, $className);
     }
 
     /**
      * libraries/ahディレクトリからロードする．
      *
      * @param string $className
-     * @return void
+     * @return bool
      */
     public function ahCoreLoad($className)
     {
-        $this->_traversal(DIR_LIB, $className);
+        return $this->_traversal(DIR_LIB, $className);
     }
 
     /**
@@ -103,24 +99,29 @@ class Autoloader
      * librariesとappのそれぞれのcommonディレクトリに対して試行する
      *
      * @param string $className
-     * @return void
+     * @return bool
      */
     public function ahCommonLoad($className)
     {
-        $this->_traversal(DIR_LIB.'/common', $className);
-        $this->_traversal(DIR_APP.'/common', $className);
+        $res = $this->_traversal(DIR_LIB.'/common', $className);
+
+        if ( $res === true ) {
+            return $res;
+        } else {
+            return $this->_traversal(DIR_APP.'/common', $className);
+        }
     }
 
     /**
      * Symfony由来のライブラリをロードする
      *
      * @param string $className
-     * @return void
+     * @return bool
      */
     public function sfLoad($className)
     {
         $filePath = DIR_LIB.'/vendor/sf/'.$className.'.php';
-        $this->_load($filePath);
+        return $this->_load($filePath);
     }
 
     /**
@@ -152,7 +153,7 @@ class Autoloader
      *
      * @param string $basepath
      * @param string $className
-     * @return void
+     * @return bool
      */
     private function _traversal($basepath, $className)
     {
@@ -162,19 +163,22 @@ class Autoloader
         array_unshift($pathStack, $basepath);
 
         $filePath  = implode('/', $pathStack).'.php';
-        $this->_load($filePath);
+        return $this->_load($filePath);
     }
 
     /**
      * 渡されたファイルパスが，読み込み可能な状態であれば，require_onceする．
      *
      * @param string $filePath
-     * @return void
+     * @return bool
      */
     private function _load($filePath)
     {
         if ( is_readable($filePath) ) {
             require_once($filePath);
+            return true;
+        } else {
+            return false;
         }
     }
 

@@ -159,6 +159,7 @@ class Resolver
     {
         try
         {
+            // TODO issue: 拡張子の除去タイミングを再考
             $path   = preg_replace('/(\.'.Request::getExtension().')$/', '', $path);
             $method = strtolower($method);
             $final  = substr($final, (strpos($final, '::')+2));
