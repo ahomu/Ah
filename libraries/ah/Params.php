@@ -127,9 +127,9 @@ class Params
 
         // escape
         if ( is_array($val) ) {
-            $val = array_walk_recursive($val, 'escapeParameter', $this->_charset);
+            array_walk_recursive($val, 'escapeParameter', $this->_charset);
         } else {
-            $val = escapeParameter($key, $val, $this->_charset);
+            escapeParameter($key, $val, $this->_charset);
         }
 
         return $val;

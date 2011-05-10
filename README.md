@@ -42,7 +42,7 @@ POST /foo/bar
 
 
 
-##Ah_ResolverによるActionの起動パターン
+##ah\ResolverによるActionの起動パターン
 
 Actionは，ah\Resolverによって起動します．
 
@@ -68,12 +68,13 @@ ah\Resolverクラスはexternalとinternalとredirectというスタティック
     \ah\Resolver::external($path, $method);
 
 ####internal
-    \ah\Resolver::internal('/foo/bar', 'POST');
-    \app\action\foo\Bar::post()
+    $Action = \ah\Resolver::internal('/foo/bar', 'POST');
+    // 内部的に実行されるアクションメソッド \app\action\foo\Bar::post()
+    
 
 ####includes
-    \ah\Resolver::includes('/hoge', 'GET');
-    \app\action\Hoge::get()
+    $responseBody = \ah\Resolver::includes('/hoge', 'GET');
+    // 内部的に実行されるアクションメソッド \app\action\Hoge::get()
 
 ####redirect
     \ah\Resolver::redirect('http://example.com');

@@ -236,10 +236,10 @@ class Resolver
      */
     private static function _argumentsMapper(& $rawPath, $method)
     {
-        $map = Config::load('map', 'arguments_mapper');
+        $map = Config::load('map', $method);
 
-        if ( !empty($map[$method]) ) {
-            foreach ( $map[$method] as $path => $args ) {
+        if ( !empty($map) ) {
+            foreach ( $map as $path => $args ) {
                 // 前方一致によって判定を行う
                 if ( strpos($rawPath, $path) === 0 ) {
                     $chunks = explode('/', substr($rawPath, strlen($path)));
