@@ -39,6 +39,14 @@ abstract class Base implements Mold
     public $Response           = null;
 
     /**
+     * このActionで使用するバリデーションクラス名
+     * Action起動時の自動バリデート時に利用される
+     *
+     * @var string
+     */
+    protected $_init_validator = 'ah\Validator';
+
+    /**
      * 各種の最終処理の実行を許可するかどうかの真偽値．
      * falseの場合，最終実行時に例外が投げられる
      *
@@ -107,7 +115,7 @@ abstract class Base implements Mold
          * 自動validate
          * 手動の時は，$this->Params->validate($my_rules, new Validator()) としてActionのメインロジック内で実行する
          */
-        $this->Params->validate($this->_validate_rule, new Validator());
+        $this->Params->validate($this->_validate_rule, new $this->_init_validator());
     }
 
     /**

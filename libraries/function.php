@@ -100,18 +100,6 @@ function is_alnum($string)
 }
 
 /**
- * is_digit
- *
- * @param string $string
- * @return boolean
- */
-function is_digit($string)
-{
-    if ( function_exists('ctype_digit') ) return ctype_digit(strval($string));
-    return (bool) preg_match('/^[0-9]+$/', $string);
-}
-
-/**
  * in_range
  *
  * @param int $i
@@ -131,11 +119,21 @@ function in_range($i, $min, $max)
  * @param string $val
  * @return bool
  */
-function is_serialized($val){
+function is_serialized($val) {
     if ( !is_string($val) ) { return false; }
     if ( trim($val) == "" ) { return false; }
     if ( preg_match("/^(i|s|a|o|d):(.*);/si",$val) !== false ) { return true; }
     return false;
+}
+
+/**
+ * is_closure
+ *
+ * @param Closure $func
+ * @return bool
+ */
+function is_closure($func) {
+    return (is_object($func) && is_callable($func));
 }
 
 /**
@@ -224,6 +222,7 @@ function matchesIn($haystack, $needle)
  */
 function checkEncoding(&$key, &$val, $charset = 'UTF-8')
 {
+    // TODO issue: 文字エンコードの検査と変換について，徳丸本あたりを参考に再度実装
     $key = mb_check_encoding($key, $charset) ? $key : 'invalid encoding';
     $val = mb_check_encoding($val, $charset) ? $val : 'invalid encoding';
 }
@@ -238,6 +237,7 @@ function checkEncoding(&$key, &$val, $charset = 'UTF-8')
  */
 function escapeParameter(&$key, &$val, $charset = 'UTF-8')
 {
+    // TODO issue: 徳丸本で要確認
     $key = htmlspecialchars($key, ENT_QUOTES, $charset);
     $val = htmlspecialchars($val, ENT_QUOTES, $charset);
 }

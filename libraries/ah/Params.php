@@ -44,7 +44,7 @@ class Params
      * @see ah\Params\isValidAll()
      * @var object ah\Validator
      */
-    private $_validator;
+    private $_Validator;
 
     /**
      * パラメーターの想定される文字コードの指定
@@ -154,7 +154,7 @@ class Params
      */
     public function validate($rule, Validator $Validator)
     {
-        $this->_validator = $Validator->validate($rule, $this->_params);
+        $this->_Validator = $Validator->validate($rule, $this->_params);
     }
 
     /**
@@ -165,7 +165,7 @@ class Params
      */
     public function isValidAll()
     {
-        return $this->_validator->isValidAll();
+        return $this->_Validator->isValidAll();
     }
 
     /**
@@ -177,7 +177,7 @@ class Params
      */
     public function isValid($key)
     {
-        return $this->_validator->isValid($key);
+        return $this->_Validator->isValid($key);
     }
 
     /**

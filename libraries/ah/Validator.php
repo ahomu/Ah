@@ -27,7 +27,6 @@ namespace ah;
  * @license     MIT License
  * @author      Ayumu Sato
  */
-// TODO issue: ユーザー拡張のエンドポイントを考える
 class Validator
 {
     /**
@@ -60,7 +59,6 @@ class Validator
 
         foreach ( $this->_rawparams as $param => $val ) {
             // $param = paramator name
-            // $val   = paramator value
 
             // ルールの指定がなければtrue
             if ( empty($rule[$param]) ) {
@@ -68,12 +66,19 @@ class Validator
                 continue;
             }
 
-            foreach ( $rule[$param] as $method => $args_or_method ) {
-                if ( is_int($method) ) { 
+            // 配列にfix
+            $paramRule = is_array($rule[$param]) ? $rule[$param] : array($rule[$param]);
+
+            foreach ( $paramRule as $maybe_method => $args_or_method ) {
+                // keyがintであれば，単純配列なので，メソッドはvalとする
+                if ( is_int($maybe_method) ) {
                     $method = $args_or_method;
                     $args   = array();
                 } else {
-                    $args   = $args_or_method;
+                // そうでなければ，連想配列なので，keyをメソッド，valを引数とする
+                    $method = $maybe_method;
+                    // 配列にfix
+                    $args   = is_array($args_or_method) ? $args_or_method : array($args_or_method);
                 }
                 $result[$param][$method] = $this->fire($method, $val, $args);
             }
@@ -135,27 +140,22 @@ class Validator
             return true;
         }
 
-        // 引数なし
-        if ( empty($args) ) {
-            return $this->$method($val);
-        }
-
         // 引数あり
         if ( !is_array($args) ) {
             $args = array($args);
         }
-        return $this->$method($val, $args);
+
+        return static::$method($val, $args, $this);
     }
 
     /**
      * equal
      *
      * @param mixed $val
-     * @param args[0] string $differ
-     * @param args[1] bool $strict
+     * @param array $args ( [0]string $differ, [1]bool $strict )
      * @return bool
      */
-    protected function equal($val, $args)
+    public static function equal($val, $args)
     {
         // needle?
         if ( empty($args[0]) ) return false;
@@ -172,111 +172,116 @@ class Validator
      * equalTo
      *
      * @param mixed $val
-     * @param args[0] string $to
-     * @param args[1] bool $strict
+     * @param array $args ( [0]string $to, [1]bool $strict )
+     * @param ah\Validator $that
      * @return bool
      */
-    protected function equalTo($val, $args)
+    public static function equalTo($val, $args, $that)
     {
         // needle?
-        if ( empty($args[0]) || empty($this->_rawparams[$args[0]]) ) return false;
+        if ( empty($args[0]) || empty($that->_rawparams[$args[0]]) ) return false;
 
         // strict?
         if ( !empty($args[1]) && $args[1] === true ) {
-            return ($val === $this->_rawparams[$args[0]]);
+            return ($val === $that->_rawparams[$args[0]]);
         } else {
-            return ($val == $this->_rawparams[$args[0]]);
+            return ($val == $that->_rawparams[$args[0]]);
         }
     }
 
-    protected function required($val)
+    public static function required($val)
     {
         return ( !empty($val) || ('0' === @$val) );
     }
 
-    protected function notNull($val)
+    public static function notEmpty($val)
     {
-        return !is_null($val);
+        return !empty($val);
     }
 
-    protected function min($val, $args)
+    public static function min($val, $args)
     {
-        $min = ($args[0]) ? $args[0] : 0;
+        $min = isset($args[0]) ? $args[0] : 0;
         return ($val >= $min);
     }
 
-    protected function max($val, $args)
+    public static function max($val, $args)
     {
-        $max = ($args[0]) ? $args[0] : 0;
+        $max = isset($args[0]) ? $args[0] : 0;
         return ($val <= $max);
     }
 
-    protected function range($val, $args)
+    public static function range($val, $args)
     {
-        $min = ($args[0]) ? $args[0] : 1;
-        $max = ($args[1]) ? $args[1] : 0;
+        $min = isset($args[0]) ? $args[0] : 1;
+        $max = isset($args[1]) ? $args[1] : 0;
         return in_range($val, $min, $max);
     }
 
-    protected function minLength($val, $args)
+    public static function minLength($val, $args)
     {
-        return $this->min(strlen($val), $args);
+        return self::min(strlen($val), $args);
     }
 
-    protected function maxLength($val, $args)
+    public static function maxLength($val, $args)
     {
-        return $this->max(strlen($val), $args);
+        return self::max(strlen($val), $args);
     }
 
-    protected function rangeLength($val, $args)
+    public static function rangeLength($val, $args)
     {
-        return $this->range(strlen($val), $args);
+        return self::range(strlen($val), $args);
     }
 
-    protected function minByte($val, $args)
+    public static function minByte($val, $args)
     {
-        return $this->min(bytelen($val), $args);
+        return self::min(bytelen($val), $args);
     }
 
-    protected function maxByte($val, $args)
+    public static function maxByte($val, $args)
     {
-        return $this->max(bytelen($val), $args);
+        return self::max(bytelen($val), $args);
     }
 
-    protected function rangeByte($val, $args)
+    public static function rangeByte($val, $args)
     {
-        return $this->range(bytelen($val), $args);
+        return self::range(bytelen($val), $args);
     }
 
-    protected function alpha($val)
+    public static function int($val)
+    {
+        return is_int($val);
+    }
+
+    public static function float($val)
+    {
+        return is_float($val);
+    }
+
+    public static function alpha($val)
     {
         return is_alpha($val);
     }
 
-    protected function digit($val)
-    {
-        return is_digit($val);
-    }
-
-    protected function numeric($val)
+    public static function numeric($val)
     {
         return is_numeric($val);
     }
 
-    protected function alnum($val)
+    public static function alnum($val)
     {
         return is_alnum($val);
     }
 
-    protected function regex($val, $args)
+    public static function regex($val, $args)
     {
         $regex = ($args[0]) ? $args[0] : '//';
-        return preg_match($regex, $val);
+        return (bool) preg_match($regex, $val);
     }
 
-    protected function date($val, $args)
+    public static function date($val, $args)
     {
-        $opt = ($args[0]) ? $args[0] : 'iso';
+        $opt = isset($args[0]) ? $args[0] : 'iso';
         return is_date($val, $opt);
     }
 
