@@ -9,14 +9,14 @@
  Dependencies Libraries
  *
  * Services_JSON
- *     /lib/Class/Services_JSON.class.php
+ *     /libraries/Common/Services_JSON.class.php
  * Spyc
- *     /lib/Class/Spyc.class.php
+ *     /libraries/Common/Spyc.class.php
  * Template
- *     /lib/Class/Template.class.php
+ *     /libraries/Common/Template.class.php
  * sfEventDispatcher
- *     /lib/Vendor/sf/sfEvent.php
- *     /lib/Vendor/sf/sfEventDispatcher.php
+ *     /libraries/Vendor/sf/sfEvent.php
+ *     /libraries/Vendor/sf/sfEventDispatcher.php
  */
 
 namespace ah;

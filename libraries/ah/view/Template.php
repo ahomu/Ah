@@ -28,7 +28,7 @@ class Template extends Base
         if (!empty($path) ) {
             $this->setTpl($path);
         }
-        return parent::__construct();
+        parent::__construct();
     }
 
     /**

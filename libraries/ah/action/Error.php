@@ -19,6 +19,7 @@ class Error extends Base
 
     public function get()
     {
+        // TODO issue: JSONでも返せるようにVIEWを利用して，paramsのformatキーまたは，ah\Request::getExtensionを参照する
         $e = $this->Params->get('exception', true);
 
         $this->Response->setMimeType(\Util_MIME::detectType('html'));

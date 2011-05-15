@@ -60,8 +60,6 @@ class Params
      * 許可パラメーターの選別・文字コードのチェックが行われる.
      * ※setParams内では，続けてバリデートも自動実行される．
      *
-     * @todo 文字コードが不正だったときには，何らかの定数をセットするほうがよい
-     *
      * @see ah\action\Base::setParams()
      * @param array $allows
      * @param array $params
@@ -74,6 +72,7 @@ class Params
         if ( !is_array($params) ) $params = array();
 
         // 初期化時に，文字コードをチェックする
+        // TODO issue: todo 文字コードが不正だったときには，何らかの定数をセットするほうがよい? ハテナに置き換える?
         $this->_charset = $charset !== null ? $charset : mb_internal_encoding();
         array_walk_recursive($params, 'checkEncoding', $this->_charset);
 

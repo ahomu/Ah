@@ -29,14 +29,17 @@ AhはPHPのWebAPIフレームワークです．作っている最中です．
 指定されたリクエストメソッドによって，Action内で実行されるメソッドが異なります．GETリクエストであればgetメソッドが，POSTリクエストであればpostメソッドがメインプロセスとして実行されます．
 
 GET /
+
     app\action\Index::get()
     /app/action/Index.php
 
 GET /foo
+
     app\action\Foo::get()
     /app/action/Foo.php
 
 POST /foo/bar
+
     action\foo\Bar::post()
     /app/action/Foo/Bar.php
 
@@ -46,7 +49,7 @@ POST /foo/bar
 
 Actionは，ah\Resolverによって起動します．
 
-ah\Resolverクラスはexternalとinternalとredirectというスタティックメソッドを持ちます．これらは，リクエストパスとメソッドを与えることで，パスに対するActionの解決と実行を行います．
+ah\Resolverクラスはexternal，internal，includesというスタティックメソッドを持ちます．これらは，リクエストパスとメソッドを与えることで，パスに対するActionの解決と実行を行います．ほか，redirectメソッドは，指定したパスに303 See Otherでリダイレクトします．
 
 ###externalメソッド
 通常は，Applicationクラスで一度だけ実行されます．Actionはoutputメソッドを起動し，HTTPレスポンスを返します

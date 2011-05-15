@@ -60,10 +60,8 @@ class Resolver
      */
     public static function external($path, $method)
     {
-        // map args
         $params = self::_argumentsMapper($path, $method);
 
-        // set params
         if ( empty($params) ) {
             $params = Request::getParams($method);
         }
@@ -82,7 +80,6 @@ class Resolver
      */
     public static function internal($path, $method, $params = array())
     {
-        // map args
         if ( empty($params) ) {
             $params = self::_argumentsMapper($path, $method);
         }
@@ -100,7 +97,6 @@ class Resolver
      */
     public static function includes($path, $method, $params = array())
     {
-        // map args
         if ( empty($params) ) {
             $params = self::_argumentsMapper($path, $method);
         }
@@ -174,6 +170,7 @@ class Resolver
                 throw new MethodNotAllowed(strtoupper(implode(', ', $allowed)));
             }
 
+            // TODO issue: 必要性を廃止方向で検討し直す
             if ( !$Action->finalyIsAllowed($final) ) {
                 throw new ExecuteNotAllowed($final.' call not allowed');
             }
