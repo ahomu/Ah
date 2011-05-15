@@ -1,0 +1,7 @@
+GET :
+  - /mock :
+    - foo
+    - bar
+  - /sub/mock :
+    - foo
+    - bar
