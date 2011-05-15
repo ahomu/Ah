@@ -26,7 +26,7 @@ class Config
         if ( !array_key_exists($key, self::$RAM) ) {
             $ymlPath    = DIR_YML."/$key.yml";
 
-            if ( Cache::isValid($ymlPath, 'config') ) {
+            if ( !Cache::isModified($ymlPath, 'config') ) {
                 self::$RAM[$key] = unserialize(Cache::load($ymlPath, 'config'));
             } else {
                 self::$RAM[$key] = \Spyc::YAMLLoad($ymlPath);
