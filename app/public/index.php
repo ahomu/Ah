@@ -5,7 +5,7 @@ use ah\Autoloader,
     ah\Request,
     ah\Resolver;
 
-define('DIR_ROOT',dirname(__FILE__));
+define('DIR_ROOT',realpath(dirname(__FILE__).'/../../'));
 define('DIR_LIB', DIR_ROOT.'/libraries');
 define('DIR_APP', DIR_ROOT.'/app');
 
@@ -23,7 +23,7 @@ $Loader->register(array($Loader, 'ahLoad'), true);
 $Loader->register(array($Loader, 'sfLoad'), true);
 $Loader->register(array($Loader, 'terminate'), true);
 
-require_once('./libraries/bootstrap.php');
+require_once(DIR_LIB . '/bootstrap.php');
 
 class MyApp extends Application
 {

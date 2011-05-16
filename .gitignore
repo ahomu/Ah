@@ -1,9 +1,8 @@
-!app/libraries/action/index.action.php
 !app/template/index.html
 
 app/cache/*
 app/template/*
 app/config/*
 
-js/
-css/
+app/public/js/*
+app/public/css/*
