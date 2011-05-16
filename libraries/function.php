@@ -222,9 +222,8 @@ function matchesIn($haystack, $needle)
  */
 function checkEncoding(&$key, &$val, $charset = 'UTF-8')
 {
-    // TODO issue: 文字エンコードの検査と変換について，徳丸本あたりを参考に再度実装
-    $key = mb_check_encoding($key, $charset) ? $key : 'invalid encoding';
-    $val = mb_check_encoding($val, $charset) ? $val : 'invalid encoding';
+    $key = mb_check_encoding($key, $charset) ? $key : ($charset === 'UTF-8' ? "\xEF\xBF\xBD" : '?');
+    $val = mb_check_encoding($val, $charset) ? $val : ($charset === 'UTF-8' ? "\xEF\xBF\xBD" : '?');
 }
 
 /**
@@ -237,7 +236,6 @@ function checkEncoding(&$key, &$val, $charset = 'UTF-8')
  */
 function escapeParameter(&$key, &$val, $charset = 'UTF-8')
 {
-    // TODO issue: 徳丸本で要確認
     $key = htmlspecialchars($key, ENT_QUOTES, $charset);
     $val = htmlspecialchars($val, ENT_QUOTES, $charset);
 }

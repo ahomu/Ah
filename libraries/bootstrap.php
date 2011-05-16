@@ -48,14 +48,12 @@ abstract class Application
         ob_start();
         ob_implicit_flush(false);
 
-        // set internal encoding
-        mb_internal_encoding('UTF-8');
-
         // set charset & encoding directives
         ini_set('default_charset', 'UTF-8');
         ini_set('mbstring.script_encoding', 'UTF-8');
+        ini_set('mbstring.internal_encoding', 'UTF-8');
         ini_set('mbstring.substitute_character', '?');
-        ini_set('mbstring.http_input' , 'UTF-8');
+        ini_set('mbstring.http_input' , 'pass');
         ini_set('mbstring.http_output' , 'pass');
         ini_set('arg_separator.output', '&');
 

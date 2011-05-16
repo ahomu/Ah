@@ -88,6 +88,7 @@ abstract class Base implements Mold
     public function __construct()
     {
         $this->Response = new Response();
+        $this->Response->setCharset($this->_default_charset);
     }
 
     /**
