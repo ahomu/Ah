@@ -283,7 +283,7 @@ class Response
         event\Helper::getDispatcher()->notify(new event\Subject($this, 'response.send_before'));
 
         // send response header ( テスト時は動作させない )
-        if ( isset($_SERVER['APPLICATION_ENV']) && $_SERVER['APPLICATION_ENV'] !== 'unittest' ) {
+        if ( !isset($_SERVER['APPLICATION_ENV']) || $_SERVER['APPLICATION_ENV'] !== 'unittest' ) {
             $this->_sendHeaders();
         }
 

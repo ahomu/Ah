@@ -187,6 +187,13 @@ class Resolver
         }
         catch ( \Exception $e )
         {
+            if ( 1
+                and $e instanceof \ah\exception\ClassNotFound
+                and strpos($e->getMessage(), '\action') !== false
+            ) {
+                $e = new \ah\exception\NotFound($e->getMessage());
+            }
+
             $Error = new action\Error();
             $Error->setParams(array(
                 'exception' => $e,
@@ -203,7 +210,7 @@ class Resolver
     /**
      * 与えられたパスから，起動するアクションのパスを組み立ててインスタンスを返す．
      *
-     * @param  $path
+     * @param string $path
      * @return object $Action
      */
     private static function _actionDispatcher($path)

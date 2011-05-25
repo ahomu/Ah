@@ -33,7 +33,17 @@ class Error extends Base
                .'</head><body>'
                .'<h1>Not Found</h1>'
                .'<p>The requested URL '.$this->Params->get('path').' was not found on this server.</p>'
-               .'<p>( note : "'.$e->getMessage().'" class file is missing. )</p>'
+               .'</body></html>'
+            );
+        } elseif ( $e instanceof \ah\exception\ClassNotFound ) {
+            $this->Response->setStatusCode(500);
+            $this->Response->setBody(
+                '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">'
+               .'<html><head>'
+               .'<title>500 Class Not Found</title>'
+               .'</head><body>'
+               .'<h1>Class Not Found</h1>'
+               .'<p>note : "'.$e->getMessage().'" class is missing.</p>'
                .'</body></html>'
             );
         } elseif ( $e instanceof \ah\exception\MethodNotAllowed ) {

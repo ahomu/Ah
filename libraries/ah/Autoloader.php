@@ -190,7 +190,6 @@ class Autoloader
      */
     public function terminate($className)
     {
-        // TODO issue: ActionのNotFound(404)と，通常クラスのNotFoundを区別する
-        throw new exception\NotFound($className);
+        throw new exception\ClassNotFound($className);
     }
 }
