@@ -126,6 +126,22 @@ class Validator
     }
 
     /**
+     * バリデート結果を返す
+     * isValidAllでなかったときの，エラー詳細用
+     *
+     * @param string $key
+     * @return array
+     */
+    public function getResults($key = null)
+    {
+        if ( $key !== null ) {
+            return $this->_result[$key];
+        } else {
+            return $this->_result;
+        }
+    }
+
+    /**
      * バリデートメソッドを起動して，結果を返す．
      * requiredでなく，パラメーターがnullであればtrueとする．
      *

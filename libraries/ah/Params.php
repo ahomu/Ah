@@ -64,7 +64,6 @@ class Params
      * @param array $allows
      * @param array $params
      * @param null|string $charset
-     * @return void
      */
     public function __construct($allows, $params, $charset = null)
     {
@@ -167,7 +166,7 @@ class Params
         return $this->_Validator->isValidAll();
     }
 
-    /**
+    /** 
      * 指定したキーの直近のバリデート結果が，validであればtrue,
      * そうでなければfalseを返す．
      *
@@ -177,6 +176,18 @@ class Params
     public function isValid($key)
     {
         return $this->_Validator->isValid($key);
+    }
+
+    /**
+     * バリデート結果を返す
+     * isValidAllでなかったときの，エラー詳細用
+     *
+     * @param string $key
+     * @return array
+     */
+    public function getResults($key = null)
+    {
+        return $this->_Validator->getResults($key);
     }
 
     /**
