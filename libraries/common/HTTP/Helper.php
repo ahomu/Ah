@@ -16,10 +16,9 @@ class HTTP_Helper
      *
      * @param string $url
      * @param int $redirect
-     *
      * @return string|boolean $Http->body
      */
-    public static function get($url, $redirect = false)
+    public static function get($url, $redirect = 0)
     {
         $Http = HTTP_Helper::send($url, 'GET', null, null, '', $redirect);
         return $Http->body ? $Http->body : false;
@@ -30,10 +29,9 @@ class HTTP_Helper
      *
      * @param string $url
      * @param int $redirect
-     *
      * @return boolean $Http->error
      */
-    public static function post($url, $redirect = false)
+    public static function post($url, $redirect = 0)
     {
         $Http = HTTP_Helper::send($url, 'POST', null, null, '', $redirect);
         return $Http->error ? false : true;
@@ -47,7 +45,6 @@ class HTTP_Helper
      * @param string $user
      * @param string $pass
      * @param int $redirect
-     *
      * @return object $HTTP_Client
      */
     public static function basicAuth($url, $method = 'GET', $user, $pass, $redirect = 0)
@@ -82,7 +79,6 @@ class HTTP_Helper
      * @param string $pass
      * @param string $auth
      * @param int $redirect
-     *
      * @return string|boolean $Http->body
      */
     public static function send($url, $method = 'GET', $user = null, $pass = null, $auth = 'Basic', $redirect = 0)
@@ -107,9 +103,8 @@ class HTTP_Helper
     /**
      * redirection - Redirection helper method.
      *
-     * @param object $Http
+     * @param HTTP_Client $Http
      * @param int $loop
-     *
      * @return Object $HTTP_Client
      */
     public static function redirection(& $Http, $loop = 3)
@@ -125,12 +120,10 @@ class HTTP_Helper
             $redirect   = $Http->header['Location'];
             $tmp = parse_url($redirect);
 
-            if ( empty($tmp['host']) )
-            {
+            if ( empty($tmp['host']) ) {
                 $redirect = $Http->host.$redirect;
             }
-            if ( empty($tmp['scheme']) )
-            {
+            if ( empty($tmp['scheme']) ) {
                 $redirect = $Http->scheme.'://'.$redirect;
             }
 

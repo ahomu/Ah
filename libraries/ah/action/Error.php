@@ -80,7 +80,7 @@ class Error extends Base
                .'</body></html>'
             );
         } else {
-            die($e->getMessage());
+            die(\get_class($e).': '.$e->getMessage());
         }
     }
 }

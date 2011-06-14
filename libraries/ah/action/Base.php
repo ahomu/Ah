@@ -82,8 +82,6 @@ abstract class Base implements Mold
      * コンストラクタ
      *
      * Responseを初期化する．
-     *
-     * @return void
      */
     public function __construct()
     {

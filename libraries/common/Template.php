@@ -3,10 +3,9 @@
 /**
  * Template provides simply textbase template engine.
  *
- * @package     unknown
  * @copyright   2009 Hiroyuki Takahashi
  * @license     unknown
- * @author      Hiroyuki Takahashi (@_tk84)
+ * @author      Hiroyuki Takahashi
  */
 class Template
 {

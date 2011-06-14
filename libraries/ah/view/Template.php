@@ -20,8 +20,6 @@ class Template extends Base
      * __construct
      *
      * @param string $path
-     * @param string $extension
-     * @return void
      */
     public function __construct($path)
     {

@@ -115,8 +115,7 @@ class HTTP_Client
      */
     public function connect($url)
     {
-        if ( $this->host != parse_url($url, PHP_URL_HOST) )
-        {
+        if ( $this->host !== parse_url($url, PHP_URL_HOST) ) {
             $this->disconnect();
         }
 
@@ -167,12 +166,9 @@ class HTTP_Client
      */
     public function disconnect()
     {
-        if ( is_resource($this->_connection) )
-        {
+        if ( is_resource($this->_connection) ) {
             @fclose($this->_connection);
-        }
-        else
-        {
+        } else {
             $this->_connection = null;
         }
         return $this->_url;
@@ -227,12 +223,9 @@ class HTTP_Client
     {
         $this->error    = true;
 
-        if ( is_resource($this->_connection) )
-        {
-            if ( !!($this->writeRequest()) )
-            {
-                if ( in_array($this->parseResponse(), $this->permited) )
-                {
+        if ( is_resource($this->_connection) ) {
+            if ( !!($this->writeRequest()) ) {
+                if ( in_array($this->parseResponse(), $this->permited) ) {
                     $this->error    = false;
                 }
             }
@@ -271,20 +264,17 @@ class HTTP_Client
         $header['Host']  = "{$this->host}";
 
         // Basic Authorization
-        if ( $this->_auth == 'Basic' && !empty($this->user) && !empty($this->pass) )
-        {
+        if ( $this->_auth == 'Basic' && !empty($this->user) && !empty($this->pass) ) {
             $header['Authorization'] = 'Basic '.base64_encode("{$this->user}:{$this->pass}");
         }
 
         // Digest Authorization ( only once try )
-        if ( $this->_auth == 'Digest' && !empty($this->_digest) )
-        {
+        if ( $this->_auth == 'Digest' && !empty($this->_digest) ) {
             $header['Authorization'] = 'Digest '.$this->_digest;
         }
 
         // Build
-        switch ( $this->_method )
-        {
+        switch ( $this->_method ) {
             case 'POST' :
                 $request    = "{$this->_method} {$this->path} HTTP/{$this->version}{$eol}";
                 $header['Content-Type']   = 'application/x-www-form-urlencoded';
@@ -303,8 +293,7 @@ class HTTP_Client
             }
 
             // body?
-            if ( $this->_method == 'POST' && !empty($this->query) )
-            {
+            if ( $this->_method == 'POST' && !empty($this->query) ) {
                 $data     = $this->query;
                 $request .= "{$eol}{$data}";
             }
@@ -324,19 +313,17 @@ class HTTP_Client
     {
         $eol    = array("\r", "\n", '\r\n');
         $regex  = '/^\s?HTTP\/([0-9].[0-9x])\s+([0-9]{3})\s+([0-9a-zA-Z\s-]*)$/';
+        $rawHeader = '';
 
         while ( '' !== ($line = str_replace($eol, '', fgets($this->_connection))) ) {
-            if ( strpos($line, ':') === false && preg_match($regex, $line, $match) )
-            {
+            if ( strpos($line, ':') === false && preg_match($regex, $line, $match) ) {
                 $this->header['Status-Code'] = array(
                     'version'   => $match[1],
                     'code'      => $match[2],
                     'status'    => $match[3],
                 );
                 $rawHeader = $line.$this->eol;
-            }
-            else
-            {
+            } else {
                 list($key, $val) = explode(':', $line, 2);
                 $this->header[$key] = ltrim($val);
                 $rawHeader .= $line.$this->eol;
@@ -354,23 +341,19 @@ class HTTP_Client
             and !empty($this->user)
             and !empty($this->pass)
             and empty($this->_digest)
-            )
-        {
+        ) {
             return $this->_digestRequest();
         }
 
         // default
-        if ( $code >= 200 && $code != 204 && $code != 304 )
-        {
+        if ( $code >= 200 && $code != 204 && $code != 304 ) {
             $this->body = stream_get_contents($this->_connection);
 
-            if ( @$this->header['Transfer-Encoding'] == 'chunked' )
-            {
+            if ( @$this->header['Transfer-Encoding'] == 'chunked' ) {
                 $this->body = $this->_chunkdecode($this->body);
             }
 
-            if ( @$this->header['Content-Encoding'] == 'gzip' )
-            {
+            if ( @$this->header['Content-Encoding'] == 'gzip' ) {
                 $this->body = $this->_gzdecode($this->body);
             }
         }
@@ -381,7 +364,7 @@ class HTTP_Client
     /**
      * _digestRequest - Support digest authorization.
      *
-     * @return void
+     * @return string|bool
      */
     private function _digestRequest()
     {
@@ -393,8 +376,7 @@ class HTTP_Client
             $digest[$matches[1]] = $matches[2];
         }
 
-        if ( !empty( $digest['qop'] ) )
-        {
+        if ( !empty( $digest['qop'] ) ) {
             $digest['cnonce']    = md5(date('U'));
         }
         $digest['uri']       = $this->path;
@@ -404,45 +386,36 @@ class HTTP_Client
 
         // A1
         $A1 = null;
-        if ( $digest['algorithm'] == 'MD5' || empty($digest['algorithm']) )
-        {
+        if ( $digest['algorithm'] == 'MD5' || empty($digest['algorithm']) ) {
             $A1 =   md5(
                 $this->user.':'.
                 $digest['realm'].':'.
                 $this->pass
             );
-        }
-        else
-        {
+        } else {
             // MD5-sess
         }
 
         // A2
         $A2 = null;
-        if ( $digest['qop'] == 'auth' || empty($digest['auth'])  )
-        {
+        if ( $digest['qop'] == 'auth' || empty($digest['auth']) ) {
             $A2 =   md5(
                 $this->_method.':'.
                 $digest['uri']
             );
-        }
-        elseif ( $digest['qop'] == 'auth-int' )
-        {
+        } elseif ( $digest['qop'] == 'auth-int' ) {
             // auth-int
         }
 
         // D
         $D = null;
-        if ( empty($digest['qop']) )
-        {
+        if ( empty($digest['qop']) ) {
             $D  =   md5(
                 $A1.':'.
                 $digest['nonce'].':'.
                 $A2
             );
-        }
-        elseif ( $digest['qop'] == 'auth' || $digest['qop'] == 'auth-int' )
-        {
+        } elseif ( $digest['qop'] == 'auth' || $digest['qop'] == 'auth-int' ) {
             $D  =   md5(
                 $A1.':'.
                 $digest['nonce'].':'.
@@ -456,12 +429,9 @@ class HTTP_Client
         $digest['response'] = $D;
 
         foreach ( $digest as $key => $val ) {
-            if ( $key == 'nc' || $key == 'qop' || $key == 'algorithm' )
-            {
+            if ( $key == 'nc' || $key == 'qop' || $key == 'algorithm' ) {
                 $digest[$key]   = $key.'='.$val;
-            }
-            else
-            {
+            } else {
                 $digest[$key]   = $key.'="'.$val.'"';
             }
         }
@@ -490,12 +460,9 @@ class HTTP_Client
      */
     private function _gzdecode($data)
     {
-        if ( function_exists('gzdecode') )
-        {
+        if ( function_exists('gzdecode') ) {
             return gzdecode($data);
-        }
-        else
-        {
+        } else {
             $data   = "data:application/x-gzip;base64,".base64_encode($data); 
             $fp     = gzopen($data, "r");
             return gzread($fp, 524288); 
