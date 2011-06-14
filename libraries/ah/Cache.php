@@ -72,7 +72,7 @@ class Cache
         $dirPath   = dirname($cachePath);
 
         if ( !file_exists($dirPath) && is_writable(dirname($dirPath)) ) {
-            mkdir($dirPath, PERM_WRITABLE);
+            mkdir($dirPath, PERM_EDITABLE_DIR);
         }
 
         if ( is_writable($dirPath) ) {

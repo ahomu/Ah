@@ -1,8 +1,14 @@
-!app/template/index.html
+app/action/*
+!app/action/Index.sample.php
 
-app/cache/*
 app/template/*
-app/config/*
+!app/template/index.sample.html
 
-app/public/js/*
-app/public/css/*
+app/public/*
+!app/public/.htaccess
+!app/public/index.sample.php
+
+app/common/*
+app/cache/*
+app/config/*
+!*.gitkeep

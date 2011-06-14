@@ -13,7 +13,8 @@ define('DIR_TMP', DIR_APP.'/cache');
 define('DIR_YML', DIR_APP.'/config');
 define('DIR_TPL', DIR_APP.'/template');
 
-define('PERM_WRITABLE', 0777);
+define('PERM_EDITABLE_FILE', 0644);
+define('PERM_EDITABLE_DIR',  0755);
 
 require_once(DIR_LIB . '/ah/Autoloader.php');
 require_once(DIR_LIB . '/function.php');

@@ -1,5 +1,15 @@
+#Ah
+
 AhはPHPのWebAPIフレームワークです．作っている最中です．
 全称(Axxxxx Hxxxxx?)を考え中．
+
+##Hello World!!
+
+下記の通り，3ファイルをリネームして設置先にアクセスする．Welcome to "Ah" WebAPI　Framework!!
+
++  app/action/Index.sample.php => app/action/Index.php
++  app/template/index.sample.html => app/template/index.html
++  app/public/index.sample.php => app/public/index.php
 
 ##Ahについて
 
