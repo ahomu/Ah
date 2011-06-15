@@ -48,6 +48,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 'SCRIPT_NAME'     => '/hoge/index.php',
                 'REQUEST_URI'     => '/hoge/fuga/piyo/?hoge=fuga',
                 'HTTPS'           => 'on',
+                'REMOTE_ADDR'     => '192.168.1.107',
 
                 'EXPECT_HOST'     => 'ayumusato.com:443',
                 'EXPECT_ROOT'     => 'https://ayumusato.com:443/',
@@ -62,6 +63,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 'SCRIPT_NAME'     => '/fuga/index.php',
                 'REQUEST_URI'     => '/fuga/piyo/',
                 'HTTPS'           => null,
+                'REMOTE_ADDR'     => '192.168.1.107',
 
                 'EXPECT_HOST'     => 'havelog.ayumusato.com:80',
                 'EXPECT_ROOT'     => 'http://havelog.ayumusato.com:80/',
@@ -77,9 +79,26 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 'SCRIPT_NAME'     => '/index.php',
                 'REQUEST_URI'     => '/foo/bar.html',
                 'HTTPS'           => null,
+                'REMOTE_ADDR'     => '192.168.1.107',
 
                 'EXPECT_HOST'     => 'ah.ayumusato.com',
                 'EXPECT_ROOT'     => 'http://ah.ayumusato.com/',
+                'EXPECT_PORT'     => '',
+                'EXPECT_BASE'     => '',
+                'EXPECT_PATH'     => '/foo/bar.html',
+                'EXPECT_EXTENSION'=> 'html',
+            )),
+            array(array(
+                'HTTP_HOST'       => 'ahomu.example.com',
+                'REQUEST_METHOD'  => 'GET',
+                'SCRIPT_NAME'     => '/index.php',
+                'REQUEST_URI'     => '/foo/bar.html',
+                'HTTPS'           => null,
+                'REMOTE_ADDR'     => '192.168.1.1',
+                'HTTP_X_FORWARDED_FOR' => '192.168.1.107',
+
+                'EXPECT_HOST'     => 'ahomu.example.com',
+                'EXPECT_ROOT'     => 'http://ahomu.example.com/',
                 'EXPECT_PORT'     => '',
                 'EXPECT_BASE'     => '',
                 'EXPECT_PATH'     => '/foo/bar.html',
@@ -135,10 +154,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider serverProvider
      */
-    public function testGetBaseUri($vars)
+    public function testGetBasePath($vars)
     {
         $_SERVER = $vars;
-        $base = Request::getBaseUri();
+        $base = Request::getBasePath();
 
         // 末尾に / をつけない
         $this->assertFalse(!!(preg_match('/\/$/', $base)));
@@ -168,21 +187,31 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider serverProvider
      */
-    public function testIsSsl($vars)
+    public function testIsSSL($vars)
     {
         $_SERVER = $vars;
-        $ssl = Request::isSsl();
+        $ssl = Request::isSSL();
         $this->assertInternalType('bool', $ssl);
     }
 
     /**
      * @dataProvider serverProvider
      */
-    public function testIsXhr($vars)
+    public function testIsXHR($vars)
     {
         $_SERVER = $vars;
-        $xhr = Request::isXhr();
+        $xhr = Request::isXHR();
         $this->assertInternalType('bool', $xhr);
+    }
+
+    /**
+     * @dataProvider serverProvider
+     */
+    public function testIsFlash($vars)
+    {
+        $_SERVER = $vars;
+        $flash = Request::isFlash();
+        $this->assertInternalType('bool', $flash);
     }
 
     /**
@@ -220,6 +249,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $_SERVER = $vars;
         $base = Request::getMethod();
         $this->assertEquals('GET', $base);
+    }
+
+    /**
+     * @dataProvider serverProvider
+     */
+    public function testGetRemoteAddr($vars)
+    {
+        $_SERVER = $vars;
+        $remote = Request::getRemoteAddr();
+        $this->assertEquals('192.168.1.107', $remote);
     }
 
     /**

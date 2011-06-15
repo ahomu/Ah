@@ -66,13 +66,13 @@ class Request
      *
      * @return string
      */
-    public static function getBaseUri()
+    public static function getBasePath()
     {
-        $script_name = $_SERVER['SCRIPT_NAME'];
+        $script_name = str_replace('/app/public', '', $_SERVER['SCRIPT_NAME']);
         $request_uri = self::getRequestUri();
 
         if ( strpos($request_uri, $script_name) === 0 ) {
-            return $script_name;
+            return dirname($script_name);
         } elseif ( strpos($request_uri, dirname($script_name)) === 0 ) {
             return rtrim(dirname($script_name), '/');
         }
@@ -87,7 +87,7 @@ class Request
      */
     public static function getPath()
     {
-        $base_uri    = self::getBaseUri();
+        $base_uri    = self::getBasePath();
         $request_uri = self::getRequestUri();
 
         if ( false !== ($pos = strpos($request_uri, '?')) ) {
@@ -141,11 +141,23 @@ class Request
     }
 
     /**
+     * 接続元のIPを取得する
+     *
+     * @return string
+     */
+    public static function getRemoteAddr()
+    {
+        return isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR']
+                                                       : (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR']
+                                                                                         : '');
+    }
+
+    /**
      * SSL通信であるかを判断する．
      *
      * @return bool
      */
-    public static function isSsl()
+    public static function isSSL()
     {
         return !!( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' );
     }
@@ -155,9 +167,19 @@ class Request
 
      * @return bool
      */
-    public static function isXhr()
+    public static function isXHR()
     {
-        return !!( isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] === 'XMLHttpRequest' );
+        return !!( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest' );
+    }
+
+    /**
+     * Flashからのリクエストであるかを判断する．
+     *
+     * @return bool
+     */
+    public static function isFlash()
+    {
+        return !!( isset($_SERVER['HTTP_USER_AGENT']) && $_SERVER['HTTP_USER_AGENT'] === 'Shockwave Flash' );
     }
 
     /**
