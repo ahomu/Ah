@@ -241,6 +241,17 @@ function escapeParameter(&$key, &$val, $charset = 'UTF-8')
 }
 
 /**
+ * removeBreak
+ *
+ * @param string $str
+ * @return void
+ */
+function removeBreak(&$str)
+{
+    $str = str_replace(array("\x0D", "\x0A"), '', $str);
+}
+
+/**
  * overwrite json decode & encode functions.
  */
 if ( !function_exists('json_decode') ) {

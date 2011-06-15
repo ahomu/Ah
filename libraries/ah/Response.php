@@ -219,6 +219,7 @@ class Response
     /**
      * レスポンスヘッダーを全て送出する．
      * PHP4.4.2および5.1.2以降で，header関数自体がヘッダインジェクション対策を持っている．
+     * ただし，5.3.xで，CR(\x0D)を対象としていないことがあるのでremoveBreakを通過させる．
      * http://php.net/manual/ja/function.header.php
      *
      * @see ah\Response\send()
@@ -226,11 +227,18 @@ class Response
      */
     private function _sendHeaders()
     {
-        header(sprintf('HTTP/%s %s %s',
-                       self::HTTP_VERSION,
-                       $this->_status,
-                       self::$statusCode[$this->_status]
-        ));
+        // build phase
+        $statusLine = sprintf('HTTP/%s %s %s',
+            self::HTTP_VERSION,
+            $this->_status,
+            self::$statusCode[$this->_status]
+        );
+
+        removeBreak($statusLine);
+        array_walk($this->_headers, 'removeBreak');
+
+        // send phase
+        header($statusLine);
 
         foreach ( $this->_headers as $key => $val ) {
             $header = $key.': '.$val;
