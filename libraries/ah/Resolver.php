@@ -124,7 +124,7 @@ class Resolver
         $Res = new Response();
         $Res->setStatusCode(303);
         $Res->setLocation($path);
-        $Res->send();
+        die($Res->send());
     }
 
     /**
