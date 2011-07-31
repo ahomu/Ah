@@ -1,10 +1,10 @@
 <?php
 namespace ah;
 
-require_once dirname(__FILE__).'/../init.php';
+require_once dirname(__FILE__) . '/../init.php';
 
-require_once DIR_LIB.'/test/ah/action/Mock.php';
-require_once DIR_LIB.'/test/ah/action/sub/Mock.php';
+require_once DIR_ROOT . '/test/ah/action/Mock.php';
+require_once DIR_ROOT . '/test/ah/action/sub/Mock.php';
 
 /**
  * Test class for Resolver.

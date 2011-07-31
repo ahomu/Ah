@@ -2,13 +2,13 @@
 
 use ah\Autoloader;
 
-define('DIR_ROOT',realpath(dirname(__FILE__).'/../..'));
+define('DIR_ROOT',realpath(dirname(__FILE__).'/..'));
 define('DIR_LIB', DIR_ROOT.'/libraries');
 define('DIR_APP', DIR_ROOT.'/app');
 
-define('DIR_TMP', DIR_LIB.'/test/mock/cache');
-define('DIR_YML', DIR_LIB.'/test/mock/config');
-define('DIR_TPL', DIR_LIB.'/test/mock/template');
+define('DIR_TMP', DIR_ROOT.'/test/mock/cache');
+define('DIR_YML', DIR_ROOT.'/test/mock/config');
+define('DIR_TPL', DIR_ROOT.'/test/mock/template');
 
 define('PERM_WRITABLE', 0777);
 

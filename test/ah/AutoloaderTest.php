@@ -1,7 +1,7 @@
 <?php
 namespace ah;
 
-require_once dirname(__FILE__).'/../init.php';
+require_once dirname(__FILE__) . '/../init.php';
 
 /**
  * Test class for Autoloader.
@@ -38,7 +38,7 @@ class AutoloaderTest extends \PHPUnit_Framework_TestCase
 
     public function testAhLoad()
     {
-        $this->assertTrue($this->object->ahLoad('ah\Cache'));
+        $this->assertTrue($this->object->ahLoad('ah\Params'));
 
         $this->assertFalse($this->object->ahLoad('ah\isNotExists'));
     }

@@ -71,6 +71,17 @@ class Autoloader
     }
 
     /**
+     * libraries/ahディレクトリからロードする．
+     *
+     * @param string $className
+     * @return bool
+     */
+    public function ahCoreLoad($className)
+    {
+        return $this->_traversal(DIR_LIB, $className);
+    }
+
+    /**
      * appディレクトリからロードする．名前空間を使用する必要がある．
      * 名前空間を使わない旧来のライブラリを共存させる場合は，commonディレクトリを利用する．
      *
@@ -81,17 +92,6 @@ class Autoloader
     {
         $className = substr($className, strlen('app\\'));
         return $this->_traversal(DIR_APP, $className);
-    }
-
-    /**
-     * libraries/ahディレクトリからロードする．
-     *
-     * @param string $className
-     * @return bool
-     */
-    public function ahCoreLoad($className)
-    {
-        return $this->_traversal(DIR_LIB, $className);
     }
 
     /**
@@ -167,7 +167,7 @@ class Autoloader
     }
 
     /**
-     * 渡されたファイルパスが，読み込み可能な状態であれば，require_onceする．
+     * 渡されたファイルパスが，読み込み可能な状態であれば，requireする．
      *
      * @param string $filePath
      * @return bool
