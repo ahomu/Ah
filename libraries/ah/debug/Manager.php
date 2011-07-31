@@ -3,6 +3,7 @@
 namespace ah\debug;
 
 use ah\Config,
+    ah\Params,
     ah\event;
 
 /**
@@ -16,6 +17,8 @@ use ah\Config,
  */
 class Manager
 {
+    public static $tools = array('Tracer', 'Profiler');
+
     /**
      * ready
      *
@@ -25,12 +28,16 @@ class Manager
     {
         header('Cache-Control: private');
 
-        if ( $Config = Config::load('debug') )
-        {
-            if ( $Config['ErrorTracer']['enable'] === 'true' )
-            {
-                event\Helper::getDispatcher()->connect('error.regular', array('ah\debug\Tracer', 'regularError'));
-            }
+        $Config = new Params(self::$tools, Config::load('debug'));
+
+        if ( $Config->get('Tracer') === 'true' ) {
+            event\Helper::getDispatcher()->connect('error.regular', array('ah\debug\Tracer', 'regularError'));
+        }
+
+        if ( $Config->get('Profiler') === 'true' ) {
+            event\Helper::getDispatcher()->connect('resolver.action_before', array('ah\debug\Profiler', 'timerStart'));
+            event\Helper::getDispatcher()->connect('resolver.action_after', array('ah\debug\Profiler', 'timerEnd'));
+            event\Helper::getDispatcher()->connect('response.send_before', array('ah\debug\Profiler', 'finish'));
         }
 
         event\Helper::getDispatcher()->connect('response.send_before', array('ah\debug\Renderer', 'addOb'));
