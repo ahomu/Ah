@@ -4,10 +4,10 @@
  * HTTP_Helper provides simply wrap methods for "HTTP_Client".
  *
  * @package     HTTP
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
- * @version     0.6
+ * @version     0.8
  */
 class HTTP_Helper
 {
@@ -16,12 +16,13 @@ class HTTP_Helper
      *
      * @param string $url
      * @param int $redirect
-     * @return string|boolean $Http->body
+     * @return string|boolean
      */
     public static function get($url, $redirect = 0)
     {
         $Http = HTTP_Helper::send($url, 'GET', null, null, '', $redirect);
-        return $Http->body ? $Http->body : false;
+        $body = $Http->getResponseBody();
+        return !!($body) ? $body : false;
     }
 
     /**
@@ -29,7 +30,7 @@ class HTTP_Helper
      *
      * @param string $url
      * @param int $redirect
-     * @return boolean $Http->error
+     * @return boolean
      */
     public static function post($url, $redirect = 0)
     {
@@ -45,7 +46,7 @@ class HTTP_Helper
      * @param string $user
      * @param string $pass
      * @param int $redirect
-     * @return object $HTTP_Client
+     * @return HTTP_Client
      */
     public static function basicAuth($url, $method = 'GET', $user, $pass, $redirect = 0)
     {
@@ -62,7 +63,7 @@ class HTTP_Helper
      * @param string $pass
      * @param int $redirect
      *
-     * @return object $HTTP_Client
+     * @return HTTP_Client
      */
     public static function digestAuth($url, $method = 'GET', $user, $pass, $redirect = 0)
     {
@@ -79,7 +80,7 @@ class HTTP_Helper
      * @param string $pass
      * @param string $auth
      * @param int $redirect
-     * @return string|boolean $Http->body
+     * @return HTTP_Client
      */
     public static function send($url, $method = 'GET', $user = null, $pass = null, $auth = 'Basic', $redirect = 0)
     {
@@ -95,7 +96,9 @@ class HTTP_Helper
 
         $Http->request();
 
-        if ( $redirect != 0 ) HTTP_Helper::redirection($Http, $redirect);
+        if ( $redirect != 0 ) {
+            $Http = HTTP_Helper::redirection($Http, $redirect);
+        }
 
         return $Http;
     }
@@ -105,9 +108,9 @@ class HTTP_Helper
      *
      * @param HTTP_Client $Http
      * @param int $loop
-     * @return Object $HTTP_Client
+     * @return HTTP_Client
      */
-    public static function redirection(& $Http, $loop = 3)
+    public static function redirection($Http, $loop = 3)
     {
         $code = $Http->getResponseStatusCode();
 

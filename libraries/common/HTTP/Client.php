@@ -4,10 +4,10 @@
  * HTTP_Client provides original HTTP request send & parse response.
  *
  * @package     HTTP
- * @copyright   2010 ayumusato.com
+ * @copyright   2011 ayumusato.com
  * @license     MIT License
  * @author      Ayumu Sato
- * @version     Release: 0.7.1
+ * @version     Release: 0.8.0
  */
 class HTTP_Client
 {
@@ -167,7 +167,7 @@ class HTTP_Client
     public function disconnect()
     {
         if ( is_resource($this->_connection) ) {
-            @fclose($this->_connection);
+            fclose($this->_connection);
         } else {
             $this->_connection = null;
         }
@@ -209,15 +209,13 @@ class HTTP_Client
      */
     public function setHeader($key, $val)
     {
-        $key = str_replace(array("\r\n","\r","\n"), '', $key);
-        $val = str_replace(array("\r\n","\r","\n"), '', $val);
         $this->_header[$key] = $val;
     }
 
     /**
      * request - This is basic request method. Involve standard error handling.
      *
-     * @return boolean|string $response
+     * @return bool|string
      */
     public function request()
     {
@@ -225,10 +223,12 @@ class HTTP_Client
 
         if ( is_resource($this->_connection) ) {
             if ( !!($this->writeRequest()) ) {
-                if ( in_array($this->parseResponse(), $this->permited) ) {
-                    $this->error    = false;
-                }
+                $this->parseResponse();
+            } else {
+                $this->error = 'failed to write request.';
             }
+        } else {
+            $this->error = 'failed to open connection.';
         }
 
         return $this->error ? false
@@ -238,27 +238,25 @@ class HTTP_Client
     /**
      * sendRequest - Send request.
      *
-     * @return boolean $fwrite
+     * @return bool
      */
     public function writeRequest()
     {
         $request    = $this->_buildRequest();
         $wroteLen   = fwrite($this->_connection, $request);
-        return (bool)(strlen($request) == $wroteLen);
+        return !!(strlen($request) === $wroteLen);
     }
 
     /**
      * _buildRequest - Build request.
      *
-     * @return string $request
+     * @return string
      */
     private function _buildRequest()
     {
         $eol     = $this->eol;
         $header  = array_merge(array_diff($this->_header, array('')));
         $request = '';
-
-        // TODO issue: ヘッダから改行コードを除去する
 
         // Host
         $header['Host']  = "{$this->host}";
@@ -268,7 +266,7 @@ class HTTP_Client
             $header['Authorization'] = 'Basic '.base64_encode("{$this->user}:{$this->pass}");
         }
 
-        // Digest Authorization ( only once try )
+        // Digest Authorization ( try once )
         if ( $this->_auth == 'Digest' && !empty($this->_digest) ) {
             $header['Authorization'] = 'Digest '.$this->_digest;
         }
@@ -277,6 +275,7 @@ class HTTP_Client
         switch ( $this->_method ) {
             case 'POST' :
                 $request    = "{$this->_method} {$this->path} HTTP/{$this->version}{$eol}";
+
                 $header['Content-Type']   = 'application/x-www-form-urlencoded';
                 $header['Content-Length'] = strlen($this->query);
                 break;
@@ -287,9 +286,9 @@ class HTTP_Client
                 break;
         }
 
-            // header
+            // header ( remove EOL )
             foreach ( $header as $key => $val ) {
-                $request .= "{$key}: {$val}{$eol}";
+                $request .= str_replace(array("\r", "\n"), '', "{$key}: {$val}{$eol}");
             }
 
             // body?
@@ -307,13 +306,12 @@ class HTTP_Client
     /**
      * parseResponse - Parsing response header and body.
      *
-     * @return int $code
+     * @return int
      */
     public function parseResponse()
     {
         $eol    = array("\r", "\n", '\r\n');
         $regex  = '/^\s?HTTP\/([0-9].[0-9x])\s+([0-9]{3})\s+([0-9a-zA-Z\s-]*)$/';
-        $rawHeader = '';
 
         while ( '' !== ($line = str_replace($eol, '', fgets($this->_connection))) ) {
             if ( strpos($line, ':') === false && preg_match($regex, $line, $match) ) {
@@ -322,11 +320,9 @@ class HTTP_Client
                     'code'      => $match[2],
                     'status'    => $match[3],
                 );
-                $rawHeader = $line.$this->eol;
             } else {
                 list($key, $val) = explode(':', $line, 2);
                 $this->header[$key] = ltrim($val);
-                $rawHeader .= $line.$this->eol;
             }
         }
 
@@ -334,9 +330,9 @@ class HTTP_Client
 
         // digest
         if ( 1
-            and $code == 401
+            and $code === 401
             and isset($this->header['WWW-Authenticate'])
-            and strpos($this->header['WWW-Authenticate'], 'Digest ') == 0
+            and strpos($this->header['WWW-Authenticate'], 'Digest ') === 0
             and $this->_auth == 'Digest'
             and !empty($this->user)
             and !empty($this->pass)
@@ -345,15 +341,15 @@ class HTTP_Client
             return $this->_digestRequest();
         }
 
-        // default
-        if ( $code >= 200 && $code != 204 && $code != 304 ) {
+        // default ( 204および304でなければ )
+        if ( $code >= 200 && $code !== 204 && $code !== 304 ) {
             $this->body = stream_get_contents($this->_connection);
 
-            if ( @$this->header['Transfer-Encoding'] == 'chunked' ) {
+            if ( !empty($this->header['Transfer-Encoding']) && $this->header['Transfer-Encoding'] === 'chunked' ) {
                 $this->body = $this->_chunkdecode($this->body);
             }
 
-            if ( @$this->header['Content-Encoding'] == 'gzip' ) {
+            if ( !empty($this->header['Content-Encoding']) && $this->header['Content-Encoding'] === 'gzip' ) {
                 $this->body = $this->_gzdecode($this->body);
             }
         }
@@ -456,7 +452,7 @@ class HTTP_Client
      * _gzdecode
      *
      * @param string $data
-     * @return string $decoded
+     * @return string
      */
     private function _gzdecode($data)
     {
@@ -475,7 +471,7 @@ class HTTP_Client
      *
      * @param string $str
      * @param string $eol
-     * @return string $str
+     * @return string
      */
     private function _chunkdecode ($str, $eol = "\r\n")
     {
@@ -500,27 +496,27 @@ class HTTP_Client
     /**
      * getResponseStatus
      *
-     * @return array(3) $statusCode['version'|'code'|'status']
+     * @return string
      */
     public function getResponseStatus()
     {
-        return $this->header['Status-Code'];
+        return strval($this->header['Status-Code']['status']);
     }
 
     /**
      * getResponseStatusCode
      *
-     * @return string $statusCode
+     * @return int
      */
     public function getResponseStatusCode()
     {
-        return $this->header['Status-Code']['code'];
+        return intval($this->header['Status-Code']['code']);
     }
 
     /**
      * getResponseHeader
      *
-     * @return array $respopnseHeader
+     * @return array
      */
     public function getResponseHeader()
     {
@@ -530,10 +526,42 @@ class HTTP_Client
     /**
      * getResponseBody
      *
-     * @return string $responseBody
+     * @return string
      */
     public function getResponseBody()
     {
         return $this->body;
+    }
+
+    /**
+     * hasError
+     *
+     * @param bool $reason
+     * @return bool|string
+     */
+    public function hasError($reason = true)
+    {
+        if ( $reason === true ) {
+            return !!$this->error ? $this->error : false;
+        } else {
+            return !!$this->error;
+        }
+    }
+
+    /**
+     * hasStatusError
+     *
+     * @param bool $reason
+     * @return bool|string
+     */
+    public function hasStatusError($reason = true)
+    {
+        $err = !in_array(substr($this->getResponseStatusCode(), 0, 1), array(1, 2, 3));
+
+        if ( $reason === true ) {
+            return !!$err ? $this->getResponseStatus() : false;
+        } else {
+            return !!$err;
+        }
     }
 }
