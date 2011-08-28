@@ -96,6 +96,14 @@ class Response
     private $_nocache   = false;
 
     /**
+     * クロスドメインのリソース利用許可
+     *
+     * @see ah\Response\setAllowOrigin()
+     * @var string|array
+     */
+    private $_allowOrigin = null;
+
+    /**
      * レスポンスヘッダ
      *
      * @see ah\Response\setHeader()
@@ -193,6 +201,17 @@ class Response
     }
 
     /**
+     * クロスドメインのリソース利用を許可する通信元ドメインを指定する
+     *
+     * @param string|array $allows
+     * @return void
+     */
+    public function setAllowOrigin($allows)
+    {
+        $this->_allowOrigin = $allows;
+    }
+
+    /**
      * Cache-Controlを指定する．
      * _nocacheプロパティがtrueの場合は，そちらが優先される．
      *
@@ -285,6 +304,11 @@ class Response
 
             // disable MIME sniffing of IE8
             $this->setHeader('X-Content-Type-Options', 'nosniff');
+
+            // Allow-Access-Control-Origin
+            if ( $this->_allowOrigin !== null ) {
+                $this->setHeader('Access-Control-Allow-Origin', is_array($this->_allowOrigin) ? implode(',', $this->_allowOrigin) : $this->_allowOrigin);
+            }
         }
 
         // #EVENT send before
