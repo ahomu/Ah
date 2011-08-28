@@ -35,23 +35,21 @@ class Params
     private $_params;
 
     /**
-     * 処理済みのバリデーター
-     * ah\Params::valiate実行後に，処理済みのah\Validatorがセットされる．
-     *
-     * @see ah\Validator
-     * @see ah\Params\validate()
-     * @see ah\Params\isValid()
-     * @see ah\Params\isValidAll()
-     * @var object ah\Validator
-     */
-    private $_Validator;
-
-    /**
      * パラメーターの想定される文字コードの指定
      *
      * @var string
      */
     private $_charset;
+
+    /**
+     * 処理済みのバリデーター
+     * ah\Params::valiate実行後に，処理済みのah\Validatorがセットされる．
+     *
+     * @see ah\Validator
+     * @see ah\Params\validate()
+     * @var \ah\Validator
+     */
+    public $Validator;
 
     /**
      * コンストラクタ
@@ -152,42 +150,7 @@ class Params
      */
     public function validate($rule, Validator $Validator)
     {
-        $this->_Validator = $Validator->validate($rule, $this->_params);
-    }
-
-    /**
-     * 直近のバリデート結果が，すべてvalidであればtrue，
-     * そうでなければfalseを返す．
-     *
-     * @return boolean
-     */
-    public function isValidAll()
-    {
-        return $this->_Validator->isValidAll();
-    }
-
-    /** 
-     * 指定したキーの直近のバリデート結果が，validであればtrue,
-     * そうでなければfalseを返す．
-     *
-     * @param string $key
-     * @return boolean
-     */
-    public function isValid($key)
-    {
-        return $this->_Validator->isValid($key);
-    }
-
-    /**
-     * バリデート結果を返す
-     * isValidAllでなかったときの，エラー詳細用
-     *
-     * @param string $key
-     * @return array
-     */
-    public function getResults($key = null)
-    {
-        return $this->_Validator->getResults($key);
+        $this->Validator = $Validator->validate($rule, $this->_params);
     }
 
     /**

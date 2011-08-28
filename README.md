@@ -136,7 +136,7 @@ ah\Resolverクラスはexternal，internal，includesというスタティック
             $this->Params->get('hoge');     // 'fuga'
 
             // パラメーターのバリデート結果
-            $this->Params->isValid('hoge'); // true
+            $this->Params->Validator->isValid('hoge'); // true
 
             // MIMEタイプの指定（デフォルトはtext/html）
             $this->Response->setMimeType(Util_MIME::detectType('html'));
