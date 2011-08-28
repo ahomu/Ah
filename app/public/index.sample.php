@@ -16,15 +16,19 @@ define('DIR_TPL', DIR_APP.'/template');
 define('PERM_EDITABLE_FILE', 0644);
 define('PERM_EDITABLE_DIR',  0755);
 
-require_once(DIR_LIB . '/ah/Autoloader.php');
-require_once(DIR_LIB . '/function.php');
+require(DIR_LIB . '/ah/Autoloader.php');
+require(DIR_LIB . '/ah/Params.php');
+require(DIR_LIB . '/ah/Resolver.php');
+require(DIR_LIB . '/ah/Request.php');
+require(DIR_LIB . '/ah/Response.php');
+require(DIR_LIB . '/function.php');
 
 $Loader = new Autoloader();
 $Loader->register(array($Loader, 'ahLoad'), true);
 $Loader->register(array($Loader, 'sfLoad'), true);
 $Loader->register(array($Loader, 'terminate'), true);
 
-require_once(DIR_LIB . '/bootstrap.php');
+require(DIR_LIB . '/bootstrap.php');
 
 class MyApp extends Application
 {
