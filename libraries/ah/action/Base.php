@@ -26,15 +26,15 @@ abstract class Base implements Mold
 
     /**
      * Actionのパラメーターを保持する
-     * @see ah\Params
-     * @var object ah\Params
+     * @see \ah\Params
+     * @var \ah\Params
      */
     public $Params             = null;
 
     /**
      * Actionのレスポンスを保持する
-     * @see ah\Response
-     * @var object ah\Response
+     * @see \ah\Response
+     * @var \ah\Response
      */
     public $Response           = null;
 
@@ -50,9 +50,9 @@ abstract class Base implements Mold
      * 各種の最終処理の実行を許可するかどうかの真偽値．
      * falseの場合，最終実行時に例外が投げられる
      *
-     * @see ah\action\Base::output()
-     * @see ah\action\Base::passing()
-     * @see ah\action\Base::printing()
+     * @see \ah\action\Base::external()
+     * @see \ah\action\Base::internal()
+     * @see \ah\action\Base::includes()
      * @var bool
      */
     protected $_allow_external    = true;

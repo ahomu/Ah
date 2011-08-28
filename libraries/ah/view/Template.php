@@ -12,7 +12,7 @@ class Template extends Base
 {
     /**
      * Templateインスタンス
-     * @var object \Template
+     * @var \Template
      */
     private $tpl;
 
@@ -62,7 +62,7 @@ class Template extends Base
      *
      * @param null|string|array $blocks
      * @param array $vars
-     * @return chain
+     * @return \ah\View\Template
      */
     public function add($blocks = null, $vars = array())
     {
@@ -75,7 +75,7 @@ class Template extends Base
      * 
      * @param array $vars
      * @param null $block
-     * @return chain
+     * @return \ah\View\Template
      */
     public function build(array &$vars, $block = null)
     {

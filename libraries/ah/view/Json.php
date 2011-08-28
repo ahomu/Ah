@@ -10,7 +10,7 @@ class Json extends Base
      * build
      *
      * @param  $vars
-     * @return chain
+     * @return \ah\View\Json
      */
     public function build($vars)
     {
