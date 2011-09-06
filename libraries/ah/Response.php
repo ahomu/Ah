@@ -104,6 +104,26 @@ class Response
     private $_allowOrigin = null;
 
     /**
+     * フレームオプションの許可設定
+     * DENY: 全て拒絶
+     * SAMEORIGN: トップレベルドメインが同一の場合のみ許可
+     *
+     * @see ah\Response\setFrameOption()
+     * @var string|array
+     */
+    private $_frameOptions = 'SAMEORIGIN';
+
+    /**
+     * XSSフィルターの制御構文
+     * 0: XSSフィルタを無効にする
+     * 1: XSSフィルタを有効にする
+     *
+     * @see ah\Response\setXssProtection()
+     * @var string
+     */
+    private $_xssProtection = '1; mode=block';
+
+    /**
      * レスポンスヘッダ
      *
      * @see ah\Response\setHeader()
@@ -212,6 +232,29 @@ class Response
     }
 
     /**
+     * フレームからの呼び出しポリシーを指定する
+     * クリックジャッキング対策
+     *
+     * @param string|array $options
+     * @return void
+     */
+    public function setFrameOptions($options)
+    {
+        $this->_frameOptions = $options;
+    }
+
+    /**
+     * XSSフィルタの指定
+     *
+     * @param string $conf
+     * @return void
+     */
+    public function setXssProtection($conf)
+    {
+        $this->_xssProtection = $conf;
+    }
+
+    /**
      * Cache-Controlを指定する．
      * _nocacheプロパティがtrueの場合は，そちらが優先される．
      *
@@ -296,18 +339,28 @@ class Response
             // redirect location
             $this->setHeader('Location', $this->_location);
         } else {
-            // MIME type & charset
+            // Content-Type MIME & charset
             $this->setHeader('Content-Type', "{$this->_mimetype}; charset={$this->_charset}");
 
-            // content length
+            // Content-Length
             $this->setHeader('Content-Length', bytelen($this->_body));
 
-            // disable MIME sniffing of IE8
+            // X-Content-Type-Options / disable MIME sniffing for IE8
             $this->setHeader('X-Content-Type-Options', 'nosniff');
 
             // Allow-Access-Control-Origin
             if ( $this->_allowOrigin !== null ) {
                 $this->setHeader('Access-Control-Allow-Origin', is_array($this->_allowOrigin) ? implode(',', $this->_allowOrigin) : $this->_allowOrigin);
+            }
+
+            // X-Frame-Options
+            if ( $this->_frameOptions !== null ) {
+                $this->setHeader('X-Frame-Options', is_array($this->_frameOptions) ? implode(',', $this->_frameOptions) : $this->_frameOptions);
+            }
+
+            // X-XSS-Protection
+            if ( $this->_xssProtection !== null ) {
+                $this->setHeader('X-XSS-Protection', $this->_xssProtection);
             }
         }
 
