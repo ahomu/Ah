@@ -109,16 +109,27 @@ class Resolver
      *
      * @param  string $path path or url
      * @param  array $params GET only
+     * @param  bool $secure
      * @return void
      */
-    public static function redirect($path, $params = array())
+    public static function redirect($path, $params = array(), $secure = true)
     {
+        $host = Request::getHost();
+
         if ( !empty($params) ) {
             $path .= '?'.http_build_query($params);
         }
-        if ( !preg_match('/^https?:\/\//', $path) ) {
-            $host = Request::getHost();
+
+        // httpで始まっていなければ，現在のホストを加えて絶対URLに変換する
+        if ( !preg_match('@^https?://@', $path) ) {
             $path = (Request::isSsl() ? 'https://' : 'http://').$host.$path;
+        }
+        // または，別ホストへの絶対URLであれば動作を制限する
+        else if ( 1
+            and $secure === true
+            and !preg_match('@^https?://'.$host.'@', $path)
+        ) {
+            // TODO issue: 別ホストへのリダイレクトを制限する
         }
 
         $Res = new Response();
@@ -211,7 +222,7 @@ class Resolver
      * 与えられたパスから，起動するアクションのパスを組み立ててインスタンスを返す．
      *
      * @param string $path
-     * @return object $Action
+     * @return \ah\Action\Base $Action
      */
     private static function _actionDispatcher($path)
     {
