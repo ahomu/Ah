@@ -2,6 +2,8 @@
 
 namespace ah;
 
+// TODO issue: staticで扱うべきか要検討
+
 /**
  * ah\Cache
  *

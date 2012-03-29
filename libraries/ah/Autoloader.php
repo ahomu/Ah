@@ -162,7 +162,7 @@ class Autoloader
         $pathStack = explode($separator, $className);
         array_unshift($pathStack, $basepath);
 
-        $filePath  = implode('/', $pathStack).'.php';
+        $filePath  = implode(DIRECTORY_SEPARATOR, $pathStack).'.php';
         return $this->_load($filePath);
     }
 

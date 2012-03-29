@@ -13,6 +13,16 @@ function array_clean($array)
 }
 
 /**
+ * array_average
+ *
+ * @param array $array
+ * @return float
+ */
+function array_average($array) {
+    return array_sum($array)/count($array);
+}
+
+/**
  * is_hash
  * http://d.hatena.ne.jp/fbis/20091112/1258002754
  *
@@ -26,6 +36,19 @@ function is_hash($array)
         if ( $k !== $i++ ) return true;
     }
     return false;
+}
+
+/**
+ * is_hash_lite
+ * http://d.hatena.ne.jp/fbis/20091112/1258002754
+ *
+ * @param array $array
+ * @return bool
+ */
+function is_hash_lite($array)
+{
+    list($k) = reset($array);
+    return $k !== 0;
 }
 
 /**

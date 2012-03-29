@@ -163,7 +163,7 @@ class Request
     }
 
     /**
-     * XHRであるかを判断する．X_REQUESTED_WITHの指定は，JavaScript側のライブラリ実装に依存する．
+     * XHRであるかを判断する．X_REQUESTED_WITHの指定は，クライアント側の実装に依存する．
 
      * @return bool
      */

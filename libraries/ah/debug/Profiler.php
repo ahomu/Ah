@@ -30,13 +30,15 @@ class Profiler
 
     public static function finish()
     {
-        $ob = '<dl>';
-        foreach ( self::$resultStack as $actionName => $time ) {
-            $ob.= "<dt>$actionName</dt>";
-            $ob.= "<dd>$time</dd>";
+        if ( !empty(self::$resultStack) && \ah\Request::getMethod() !== 'POST' ) {
+            $ob = '<dl>';
+            foreach ( self::$resultStack as $actionName => $time ) {
+                $ob.= "<dt>$actionName</dt>";
+                $ob.= "<dd>$time</dd>";
+            }
+            $ob.= '</dl>';
+            Renderer::add($ob);
         }
-        $ob.= '</dl>';
-        Renderer::add($ob);
     }
 
     public static function _now()

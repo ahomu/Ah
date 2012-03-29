@@ -86,6 +86,7 @@ class Template extends Base
         foreach ( $vars as $key => $val ) {
             if ( is_array($val) ) {
                 // hashでなければ、loop等と見なして親ブロックを固定
+                $val = array_clean($val);
                 $key = ($isHash === false) ? $block : $key;
                 $this->build($val, $key);
             } else {

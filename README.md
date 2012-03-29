@@ -1,7 +1,6 @@
-#Ah
+#Ah ( Action Hopper - Web API Framework )
 
 AhはPHPのWebAPIフレームワークです．作っている最中です．
-全称(Axxxxx Hxxxxx?)を考え中．
 
 ##Hello World!!
 
@@ -10,6 +9,8 @@ AhはPHPのWebAPIフレームワークです．作っている最中です．
 +  app/action/Index.sample.php => app/action/Index.php
 +  app/template/index.sample.html => app/template/index.html
 +  app/public/index.sample.php => app/public/index.php
+
+
 
 ##Ahについて
 
@@ -34,7 +35,7 @@ AhはPHPのWebAPIフレームワークです．作っている最中です．
 
 ##Actionの起動ルールと，ファイルの既定位置
 
-クラス名はリクエストと対応します．/fooのリクエストで呼び出されるActionは，Action_Fooとなります．この場合のクラスファイルは，actionディレクトリ(/app/action)内に，/action/Foo.action.phpとして配置します．クラス名の部分は常にアッパーケースであることに注意して下さい．
+クラス名はリクエストと対応します．/fooのリクエストで呼び出されるActionは，Action_Fooとなります．この場合のクラスファイルは，actionディレクトリ(/app/action)内に，/action/Foo.phpとして配置します．クラス名の部分は常にアッパーケースであることに注意して下さい．
 
 指定されたリクエストメソッドによって，Action内で実行されるメソッドが異なります．GETリクエストであればgetメソッドが，POSTリクエストであればpostメソッドがメインプロセスとして実行されます．
 
@@ -139,7 +140,7 @@ ah\Resolverクラスはexternal，internal，includesというスタティック
             $this->Params->Validator->isValid('hoge'); // true
 
             // MIMEタイプの指定（デフォルトはtext/html）
-            $this->Response->setMimeType(Util_MIME::detectType('html'));
+            $this->Response->setMimeType(\Util_MIME::detectType('html'));
 
             // ステータスコードの指定（デフォルトは200）
             $this->Response->setStatusCode(200);
